@@ -29,7 +29,7 @@ const buscar = debounce(async () => {
     }
 
     try {
-        const { data } = await axios.get('http://127.0.0.1:8000/api/v1/producciones', {
+        const { data } = await axios.get('https://movietrackapi.up.railway.app/api/v1/producciones', {
             params: {
                 'titulo[like]': termino.value
             }
@@ -81,7 +81,7 @@ onBeforeUnmount(() => {
     width: 100%;
     padding: 0.4rem 0.6rem;
     border-radius: 6px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--terciary-color);
     background-color: var(--terciary-color);
     caret-color: var(--primary-color);
 }

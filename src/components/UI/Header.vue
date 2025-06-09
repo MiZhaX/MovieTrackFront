@@ -16,20 +16,33 @@
                 </div>
             </div>
 
-            <RouterLink to="/about" class="enlace inicioSesion">Iniciar sesión</RouterLink>
+            <div v-if="!user">
+                <RouterLink to="/login" class="enlace inicioSesion">Iniciar sesión</RouterLink>
+            </div>
+            <div v-else class="d-flex align-items-center gap-2">
+                <RouterLink :to="`/perfil/${user.id}`" class="enlace inicioSesion">
+                    Mi Perfil
+                </RouterLink>
+                <p class="enlace inicioSesion" @click="logout">
+                    Cerrar sesión
+                </p>
+            </div>
         </div>
     </nav>
 </template>
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import '../../assets/css/variables.css'
 import Buscador from './Buscador.vue'
 
 const route = useRoute();
+const router = useRouter();
 
 const scrollY = ref(0);
 const scrolled = ref(false);
+
+const user = ref(null);
 
 const handleScroll = () => {
     scrollY.value = window.scrollY;
@@ -38,15 +51,32 @@ const handleScroll = () => {
 
 onMounted(() => {
     window.addEventListener('scroll', handleScroll);
+    const userData = localStorage.getItem('user');
+    user.value = userData ? JSON.parse(userData) : null;
 });
 
 onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll);
 });
 
+watch(
+    () => route.fullPath,
+    () => {
+        const userData = localStorage.getItem('user');
+        user.value = userData ? JSON.parse(userData) : null;
+    }
+);
+
 const isActive = (ruta) => {
     return route.path.startsWith(ruta);
 };
+
+function logout() {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    user.value = null;
+    router.push('/');
+}
 </script>
 
 <style scoped>
@@ -57,6 +87,7 @@ const isActive = (ruta) => {
     padding-bottom: 5px;
     min-height: 13vh;
     transition: all 0.3s ease;
+    align-items: center;
 }
 
 .linkLogo {
@@ -92,7 +123,6 @@ const isActive = (ruta) => {
 
 .buscador {
     background-color: var(--terciary-color);
-    border: 1px solid black;
 
     height: 40%;
 }
@@ -108,8 +138,6 @@ const isActive = (ruta) => {
     background-color: var(--terciary-color);
     padding: 5px;
     border-radius: 10px;
-    border: 1px solid var(--cuaternary-color);
-
     width: 100%;
     text-align: center;
 }
@@ -122,7 +150,18 @@ const isActive = (ruta) => {
     display: flex;
     align-items: center;
 
-    font-size: large;
+    font-size: x-large;
+    font-weight: bold;
+    color: var(--terciary-color);
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+    margin: 1rem;
+}
+
+.inicioSesion:hover {
+    background-color: var(--terciary-color);
+    color: black;
+    border-radius: 5px;
 }
 
 .boton.activa {

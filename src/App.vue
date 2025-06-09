@@ -13,7 +13,12 @@ import '@/assets/css/variables.css'
 </script>
 <style scoped>
 .main-container {
-  background-color: var(--primary-color);
+  background: url('/assets/img/fondo3.jpeg') no-repeat center center fixed;
+  background-size: cover;
   min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 </style>

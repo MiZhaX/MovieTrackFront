@@ -1,12 +1,12 @@
 <template>
-  <div class="produccion-card">
+  <div class="produccion-card" :style="{ width: props.tamano + 'px'}">
     <RouterLink :to="`/producciones/${produccion.id}`"><img
       :src="posterPath"
       :alt="produccion.titulo"
       @error="setDefaultImage"
       ref="imgRef"
     /></RouterLink>
-    <p>{{ produccion.titulo }} - {{ produccion.puntuacion_critica }}⭐</p>
+    <p class="titulo">{{ produccion.titulo }} <span v-if="detalles">- {{ produccion.puntuacion_critica }}⭐</span></p>
   </div>
 </template>
 
@@ -14,7 +14,12 @@
 import { ref } from 'vue';
 
 const props = defineProps({
-  produccion: Object
+  produccion: Object,
+  tamano: Number,
+  detalles: {
+    type: Boolean,
+    default: true
+  }
 });
 
 const imgRef = ref(null);
@@ -30,12 +35,16 @@ function setDefaultImage() {
 
 <style scoped>
 .produccion-card {
-  width: 200px;
   text-align: center;
 }
 .produccion-card img {
   width: 100%;
   border-radius: 8px;
   object-fit: cover;
+}
+
+.titulo {
+  color: black;
+  font-weight: 500;
 }
 </style>

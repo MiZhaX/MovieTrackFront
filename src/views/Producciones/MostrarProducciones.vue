@@ -20,7 +20,7 @@ const fetchProducciones = async (page = 1) => {
 
     try {
         const response = await axios.get(
-            `http://127.0.0.1:8000/api/v1/producciones?tipo[eq]=${tipo}&page=${page}`
+            `https://movietrackapi.up.railway.app/api/v1/producciones?tipo[eq]=${tipo}&page=${page}`
         );
         producciones.value = response.data.data;
         currentPage.value = response.data.meta.current_page;
@@ -44,7 +44,7 @@ watch(() => route.path, () => fetchProducciones(1));
             <Filters></Filters>
             <div class="producciones">
                 <div class="grid">
-                    <ProduccionCard v-for="p in producciones" :key="p.id" :produccion="p" />
+                    <ProduccionCard v-for="p in producciones" :key="p.id" :produccion="p" :tamano="200"/>
                 </div>
             </div>
             <Pagination :currentPage="currentPage" :lastPage="lastPage" @cambiar-pagina="fetchProducciones" />

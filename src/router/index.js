@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes: [
     {
       path: '/',
@@ -28,8 +28,39 @@ const router = createRouter({
       path: '/producciones/:produccionId',
       name: 'produccionesDetalle',
       component: () => import('../views/Producciones/ProduccionesDetalle.vue'),
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('../views/Login.vue'),
+    },
+    {
+      path: '/perfil/:usuarioId',
+      name: 'perfil',
+      component: () => import('../views/Perfil.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/personas/:personaId',
+      name: 'personaDetalle',
+      component: () => import('../views/Personas/Persona.vue'),
     }
   ],
+  scrollBehavior(to, from, savedPosition) {
+    return { top: 0 }
+  }
+})
+
+function estaLogueado() {
+  return !!localStorage.getItem('user') 
+}
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && !estaLogueado()) {
+    next({ path: '/login' })
+  } else {
+    next()
+  }
 })
 
 export default router
