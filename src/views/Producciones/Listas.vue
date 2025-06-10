@@ -1,7 +1,7 @@
 <template>
   <main>
     <div class="contenedor">
-      <p>RANKING PAGE WIP</p>
+      <p>LISTAS PAGE WIP</p>
     </div>
   </main>
 </template>

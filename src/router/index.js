@@ -44,6 +44,16 @@ const router = createRouter({
       path: '/personas/:personaId',
       name: 'personaDetalle',
       component: () => import('../views/Personas/Persona.vue'),
+    },
+    {
+      path: '/ranking',
+      name: 'ranking',
+      component: () => import('../views/Ranking/Ranking.vue'),
+    },
+    {
+      path: '/listas/:listaId',
+      name: 'lista',
+      component: () => import('../views/Producciones/Listas.vue'),
     }
   ],
   scrollBehavior(to, from, savedPosition) {

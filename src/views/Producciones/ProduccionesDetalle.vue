@@ -66,7 +66,20 @@
                             </div>
                         </div>
                         <div class="acciones mt-4 d-flex justify-content-between">
-                            <button class="btn me-2 btn-primary" @click="puntuarProduccion">Puntuar</button>
+                            <div class="botones d-flex">
+                                <button class="btn me-2 btn-primary" @click="puntuarProduccion">Puntuar</button>
+                                <select
+                                    v-if="user && listasPersonalizadas.length > 0"
+                                    name="listasPersonalizadas"
+                                    id="listasPersonalizadas"
+                                    class="form-select"
+                                >
+                                    <option selected value="">Añadir a...</option>
+                                    <option v-for="lista in listasPersonalizadas" :key="lista.id" :value="lista.id">
+                                        {{ lista.nombre }}
+                                    </option>
+                                </select>
+                            </div>
                             <div class="marcas">
                                 <button :class="['btn', 'me-2', visualizada ? 'btn-secondary' : 'btn-primary']"
                                     @click="marcarProduccion({ marcaParam: visualizada ? 0 : 1 })" title="Visualizada">
@@ -107,14 +120,15 @@ const quieroVer = ref(false);
 const marca = ref(null);
 const imgRef = ref(null);
 
+// NUEVO: listas personalizadas del usuario
+const listasPersonalizadas = ref([]);
+
 const fetchProduccion = async () => {
     try {
         cargando.value = true;
-
         const produccionId = route.params.produccionId;
         const response = await axios.get(`https://movietrackapi.up.railway.app/api/v1/producciones/${produccionId}`);
         produccion.value = response.data.data;
-        console.log(produccion.value)
         posterPath.value = `/assets/img/producciones/${produccion.value.id}.webp`;
     } catch (error) {
         console.error('Error fetching produccion:', error);
@@ -122,6 +136,42 @@ const fetchProduccion = async () => {
         cargando.value = false;
     }
 };
+
+async function fetchListasPersonalizadas() {
+    if (!user.value) return;
+    try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(
+            `https://movietrackapi.up.railway.app/api/v1/listasPersonalizadas?usuario_id[eq]=${user.value.id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+        listasPersonalizadas.value = response.data.data || [];
+    } catch (error) {
+        console.error('Error obteniendo listas personalizadas:', error);
+        listasPersonalizadas.value = [];
+    }
+}
+
+onMounted(async () => {
+    const storedUser = localStorage.getItem('user');
+    user.value = storedUser ? JSON.parse(storedUser) : null;
+    await fetchProduccion();
+    await comprobarMarca();
+    await fetchListasPersonalizadas();
+});
+
+watch(
+    () => route.params.produccionId,
+    async () => {
+        await fetchProduccion();
+        await comprobarMarca();
+        await fetchListasPersonalizadas();
+    }
+);
 
 function formatearFecha(fecha) {
     if (!fecha) return '';
@@ -158,9 +208,9 @@ watch(
 );
 
 function setDefaultImage() {
-  if (imgRef.value) {
-    imgRef.value.src = '/assets/img/default.png';
-  }
+    if (imgRef.value) {
+        imgRef.value.src = '/assets/img/default.png';
+    }
 }
 
 async function comprobarMarca() {
@@ -170,7 +220,7 @@ async function comprobarMarca() {
     if (!user.value || !produccion.value) {
         cargando.value = false;
         return;
-    } 
+    }
     try {
         const token = localStorage.getItem('token');
         const { data } = await axios.get('https://movietrackapi.up.railway.app/api/v1/marcarProducciones', {
@@ -248,6 +298,14 @@ async function marcarProduccion({ marcaParam = undefined, favorita = undefined }
     } catch (error) {
         alert('Error al marcar la producción.');
         console.error(error);
+    }
+}
+
+function puntuarProduccion() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/login';
+        return;
     }
 }
 
@@ -347,5 +405,9 @@ async function marcarProduccion({ marcaParam = undefined, favorita = undefined }
 .btn-secondary:hover {
     background-color: var(--terciary-color);
     border: 1px solid var(--terciary-color);
+}
+
+.form-select {
+    background-color: var(--terciary-color);
 }
 </style>
