@@ -308,7 +308,6 @@ async function fetchListasReproduccion() {
 
 <style scoped>
 .perfil-layout {
-    background: #b2c7cc;
     min-height: 100vh;
     padding: 2rem 0;
     padding-top: 7rem;

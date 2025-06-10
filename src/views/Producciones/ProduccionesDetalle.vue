@@ -68,17 +68,7 @@
                         <div class="acciones mt-4 d-flex justify-content-between">
                             <div class="botones d-flex">
                                 <button class="btn me-2 btn-primary" @click="puntuarProduccion">Puntuar</button>
-                                <select
-                                    v-if="user && listasPersonalizadas.length > 0"
-                                    name="listasPersonalizadas"
-                                    id="listasPersonalizadas"
-                                    class="form-select"
-                                >
-                                    <option selected value="">Añadir a...</option>
-                                    <option v-for="lista in listasPersonalizadas" :key="lista.id" :value="lista.id">
-                                        {{ lista.nombre }}
-                                    </option>
-                                </select>
+                                <button class="btn me-2 btn-primary" @click="abrirModalLista">Añadir a lista</button>
                             </div>
                             <div class="marcas">
                                 <button :class="['btn', 'me-2', visualizada ? 'btn-secondary' : 'btn-primary']"
@@ -100,7 +90,38 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="modalListas" tabindex="-1" aria-labelledby="modalListasLabel" aria-hidden="true" ref="modalListasRef">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form @submit.prevent="añadirALista">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalListasLabel">Añadir a lista</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+              <div v-if="listasPersonalizadas.length > 0">
+                <select id="selectLista" v-model="listaSeleccionada" class="form-select" required>
+                  <option disabled value="">Selecciona una lista</option>
+                  <option v-for="lista in listasPersonalizadas" :key="lista.id" :value="lista.id">
+                    {{ lista.nombre }}
+                  </option>
+                </select>
+              </div>
+              <div v-else>
+                <p>No tienes listas de reproducción. Crea una desde tu perfil.</p>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-primary" :disabled="!listaSeleccionada || !listasPersonalizadas.length">Añadir</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 </template>
+
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -108,6 +129,7 @@ import axios from 'axios';
 import Loading from '@/components/UI/Loading.vue';
 import ActorCard from '@/components/ActorCard.vue';
 import DirectorCard from '@/components/DirectorCard.vue';
+import { Modal } from 'bootstrap';
 
 const route = useRoute();
 const produccion = ref(null);
@@ -120,9 +142,48 @@ const quieroVer = ref(false);
 const marca = ref(null);
 const imgRef = ref(null);
 
-// NUEVO: listas personalizadas del usuario
 const listasPersonalizadas = ref([]);
+const modalListasRef = ref(null);
+const listaSeleccionada = ref('');
 
+function abrirModalLista() {
+    listaSeleccionada.value = '';
+    if (modalListasRef.value) {
+        const modal = Modal.getOrCreateInstance(modalListasRef.value);
+        modal.show();
+    }
+}
+
+async function añadirALista() {
+    if (!listaSeleccionada.value) return;
+    try {
+        const token = localStorage.getItem('token');
+        await axios.post(
+            'https://movietrackapi.up.railway.app/api/v1/produccionesListas',
+            {
+                lista_personalizada_id: listaSeleccionada.value,
+                produccion_id: produccion.value.id
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+        // Cerrar modal
+        if (modalListasRef.value) {
+            const modal = Modal.getOrCreateInstance(modalListasRef.value);
+            modal.hide();
+        }
+        // Opcional: feedback al usuario
+        alert('Producción añadida a la lista correctamente.');
+    } catch (error) {
+        alert('Error al añadir a la lista.');
+        console.error(error);
+    }
+}
+
+// --- FUNCIONES Y WATCHERS EXISTENTES ---
 const fetchProduccion = async () => {
     try {
         cargando.value = true;
@@ -310,6 +371,7 @@ function puntuarProduccion() {
 }
 
 </script>
+
 <style scoped>
 .titulo {
     text-align: center;

@@ -52,7 +52,7 @@ function handleClickOutside(event) {
 const getPoster = (id) => `/assets/img/producciones/${id}.webp`;
 
 const ponerImagenPorDefecto = (e) => {
-    e.target.src = '/assets/img/default.webp';
+    e.target.src = '/assets/img/default.png';
 };
 
 const reset = () => {
