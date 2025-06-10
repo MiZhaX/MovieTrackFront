@@ -375,6 +375,23 @@ function puntuarProduccion() {
     flex-wrap: wrap;
     gap: 1.5rem;
     margin-top: 1rem;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--terciary-color) transparent;
+}
+
+.reparto-lista::-webkit-scrollbar {
+    height: 8px;
+    background: transparent;
+}
+
+.reparto-lista::-webkit-scrollbar-thumb {
+    background: var(--terciary-color);
+    border-radius: 8px;
+}
+
+.reparto-lista::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 #produccionTabContent {
