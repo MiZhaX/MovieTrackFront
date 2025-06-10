@@ -102,7 +102,7 @@
             <div class="modal-body">
               <div v-if="listasPersonalizadas.length > 0">
                 <select id="selectLista" v-model="listaSeleccionada" class="form-select" required>
-                  <option disabled value="">Selecciona una lista</option>
+                  <option value="">Selecciona una lista</option>
                   <option v-for="lista in listasPersonalizadas" :key="lista.id" :value="lista.id">
                     {{ lista.nombre }}
                   </option>
@@ -170,20 +170,17 @@ async function añadirALista() {
                 }
             }
         );
-        // Cerrar modal
         if (modalListasRef.value) {
             const modal = Modal.getOrCreateInstance(modalListasRef.value);
             modal.hide();
         }
-        // Opcional: feedback al usuario
         alert('Producción añadida a la lista correctamente.');
     } catch (error) {
-        alert('Error al añadir a la lista.');
+        alert('Ya existe esta producción en la lista');
         console.error(error);
     }
 }
 
-// --- FUNCIONES Y WATCHERS EXISTENTES ---
 const fetchProduccion = async () => {
     try {
         cargando.value = true;
@@ -437,23 +434,6 @@ function puntuarProduccion() {
     flex-wrap: wrap;
     gap: 1.5rem;
     margin-top: 1rem;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--terciary-color) transparent;
-}
-
-.reparto-lista::-webkit-scrollbar {
-    height: 8px;
-    background: transparent;
-}
-
-.reparto-lista::-webkit-scrollbar-thumb {
-    background: var(--terciary-color);
-    border-radius: 8px;
-}
-
-.reparto-lista::-webkit-scrollbar-track {
-    background: transparent;
 }
 
 #produccionTabContent {
@@ -461,7 +441,24 @@ function puntuarProduccion() {
     border: 3px solid var(--secondary-color);
     padding-left: 1.5rem;
     padding-right: 1.5rem;
-    height: 310px;
+    height: 330px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--terciary-color) transparent;
+}
+
+#produccionTabContent::-webkit-scrollbar {
+    height: 8px;
+    background: transparent;
+}
+
+#produccionTabContent::-webkit-scrollbar-thumb {
+    background: var(--terciary-color);
+    border-radius: 8px;
+}
+
+#produccionTabContent::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .btn-primary {
@@ -488,5 +485,10 @@ function puntuarProduccion() {
 
 .form-select {
     background-color: var(--terciary-color);
+}
+
+.form-select:focus {
+    border-color: none;
+    box-shadow: none;
 }
 </style>

@@ -4,7 +4,7 @@
         <div v-if="!cargando && persona" class="detalles">
             <h2 class="nombre">{{ persona.nombre }}</h2>
             <div class="infoDetalles">
-                <img :src="posterPath" alt="poster" class="poster">
+                <img :src="posterPath" alt="poster" class="poster" @error="handleImageError">
                 <div class="info d-flex justify-content-between flex-column w-100">
                     <div class="tabla">
                         <ul class="nav nav-tabs" id="personaTab" role="tablist">
@@ -37,8 +37,8 @@
                             </div>
                             <div v-if="persona.actuaciones && persona.actuaciones.length > 0" class="tab-pane fade" id="actuacion" role="tabpanel" aria-labelledby="actuacion-tab">
                                 <div class="lista">
-                                    <div v-for="actuacion in persona.actuaciones" :key="actuacion.produccion.id">
-                                        <ProductionCard :produccion="actuacion.produccion" :tamano="150" :detalles="false"/>
+                                    <div v-for="actuacion in persona.actuaciones" :key="actuacion.produccion.id" class="d-flex flex-column align-items-center">
+                                        <ProductionCard :produccion="actuacion.produccion" :tamano="145" :detalles="false"/>
                                         <p class="text-center m-0">{{ actuacion.rol }}</p>
                                     </div>
                                 </div>
@@ -46,7 +46,7 @@
                             <div v-if="persona.direcciones && persona.direcciones.length > 0" class="tab-pane fade" id="direccion" role="tabpanel" aria-labelledby="direccion-tab">
                                 <div class="lista">
                                     <ProductionCard v-for="produccion in persona.direcciones" :key="produccion.id"
-                                        :produccion="produccion" :tamano="150" :detalles="false"/>
+                                        :produccion="produccion" :tamano="145" :detalles="false"/>
                                 </div>
                             </div>
                         </div>
@@ -68,6 +68,10 @@ const persona = ref(null);
 const cargando = ref(true);
 const posterPath = ref('');
 const route = useRoute();
+
+const handleImageError = (event) => {
+  event.target.src = '/assets/img/default.png'
+}
 
 const fetchPersona = async () => {
     try {
@@ -160,11 +164,24 @@ onMounted(async () => {
     border: 3px solid var(--secondary-color);
     padding-left: 1.5rem;
     padding-right: 1.5rem;
-    height: 100%;
-    min-height: 385px;
-    display: flex;
-    flex-direction: column;
-    justify-content: stretch;
+    height: 330px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--terciary-color) transparent;
+}
+
+#personaTabContent::-webkit-scrollbar {
+    height: 8px;
+    background: transparent;
+}
+
+#personaTabContent::-webkit-scrollbar-thumb {
+    background: var(--terciary-color);
+    border-radius: 8px;
+}
+
+#personaTabContent::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .lista {

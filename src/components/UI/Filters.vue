@@ -2,9 +2,9 @@
     <div class="botonesFiltros">
         <select href="" class="orderby boton">
             <option value="defecto">≡ Filtrar</option>
-            <option value="defecto">Alfabeticamente</option>
-            <option value="defecto">Valoración (Crítica)</option>
-            <option value="defecto">Valoración (Usuarios)</option>
+            <option value="defecto">WIP</option>
+            <!-- <option value="defecto">Valoración (Crítica)</option>
+            <option value="defecto">Valoración (Usuarios)</option> -->
         </select>
     </div>
 </template>

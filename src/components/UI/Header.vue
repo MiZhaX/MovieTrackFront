@@ -35,6 +35,7 @@ import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import '../../assets/css/variables.css'
 import Buscador from './Buscador.vue'
+import axios from 'axios'
 
 const route = useRoute();
 const router = useRouter();
@@ -71,11 +72,27 @@ const isActive = (ruta) => {
     return route.path.startsWith(ruta);
 };
 
-function logout() {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    user.value = null;
-    router.push('/');
+async function logout() {
+    const token = localStorage.getItem('token');
+    try {
+        if (token) {
+            await axios.post(
+                'https://movietrackapi.up.railway.app/api/logout',
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+        }
+    } catch (e) {
+    } finally {
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        user.value = null;
+        router.push('/');
+    }
 }
 </script>
 

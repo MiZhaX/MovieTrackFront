@@ -51,9 +51,10 @@ const router = createRouter({
       component: () => import('../views/Ranking/Ranking.vue'),
     },
     {
-      path: '/listas/:listaId',
+      path: '/listas/:listaNombre/:listaId',
       name: 'lista',
       component: () => import('../views/Producciones/Listas.vue'),
+      meta: { requiresAuth: true },
     }
   ],
   scrollBehavior(to, from, savedPosition) {

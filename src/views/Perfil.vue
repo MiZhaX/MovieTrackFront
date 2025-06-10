@@ -38,7 +38,7 @@
                             </button>
                         </div>
                         <div v-if="user.playlists && user.playlists.length > 0" class="listas-scroll">
-                            <RouterLink v-for="lista in user.playlists" :key="lista.id" :to="`/listas/${lista.id}`"
+                            <RouterLink v-for="lista in user.playlists" :key="lista.id" :to="`/listas/${lista.nombre}/${lista.id}`"
                                 class="lista-card">
                                 <div class="lista-card-img">
                                     <font-awesome-icon :icon="['fas', 'list']" size="2x" />

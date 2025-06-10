@@ -6,7 +6,7 @@
       @error="setDefaultImage"
       ref="imgRef"
     /></RouterLink>
-    <p class="titulo">{{ produccion.titulo }} <span v-if="detalles">- {{ produccion.puntuacion_critica }}⭐</span></p>
+    <p class="titulo m-0">{{ produccion.titulo }} <span v-if="detalles">- {{ produccion.puntuacion_critica }}⭐</span></p>
   </div>
 </template>
 
