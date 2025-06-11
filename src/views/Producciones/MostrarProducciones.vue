@@ -1,11 +1,13 @@
 <template>
-    <div class="contenedor">
-        <Loading :cargando="cargando"></Loading>
-        <div v-if="!cargando">
+    <div class="relleno"></div>
+    <Loading :cargando="cargando"></Loading>
+    <div v-if="!cargando" class="contenedor">
+        <div>
             <Filters></Filters>
             <div class="producciones">
                 <div class="gridPeliculas">
-                    <ProduccionCard v-for="p in producciones" :key="p.id" :produccion="p" :tamano="200" :detalles="false"/>
+                    <ProduccionCard v-for="p in producciones" :key="p.id" :produccion="p" :tamano="200"
+                        :detalles="false" />
                 </div>
             </div>
             <Pagination :currentPage="currentPage" :lastPage="lastPage" @cambiar-pagina="fetchProducciones" />

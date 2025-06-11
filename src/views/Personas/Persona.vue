@@ -1,7 +1,8 @@
 <template>
-    <div class="contenedor">
-        <Loading :cargando="cargando"></Loading>
-        <div v-if="!cargando && persona" class="detalles">
+    <div class="relleno"></div>
+    <Loading :cargando="cargando"></Loading>
+    <div v-if="!cargando && persona" class="contenedor">
+        <div class="detalles">
             <h2 class="nombre">{{ persona.nombre }}</h2>
             <div class="infoDetalles">
                 <img :src="posterPath" alt="poster" class="poster" @error="handleImageError">
@@ -102,18 +103,23 @@ onMounted(async () => {
 })
 </script>
 <style scoped>
+.relleno {
+    min-height: 12vh;
+}
+
 .nombre {
     text-align: center;
     margin-top: 1rem;
 }
 
 .contenedor {
-    padding-top: 6rem;
+    margin: 0 auto;
     margin-left: 10rem;
     margin-right: 10rem;
-    min-height: 92.2vh;
     background-color: var(--cuaternary-color);
     padding-bottom: 1rem;
+    border-radius: 10px;
+    padding-bottom: 3rem;
 }
 
 .infoDetalles {
@@ -127,8 +133,8 @@ onMounted(async () => {
 
 .poster {
     width: 295px;
-    min-width: 295px;
-    max-width: 295px;
+    min-width: 275px;
+    max-width: 275px;
     height: 100%;
     border-radius: 10px;
     object-fit: cover;
@@ -162,11 +168,11 @@ onMounted(async () => {
 }
 
 #personaTabContent {
-    background: var(--primary-color);
-    border: 3px solid var(--secondary-color);
+    border-top: 3px solid var(--secondary-color);
+    border-bottom: 3px solid var(--secondary-color);
     padding-left: 1.5rem;
     padding-right: 1.5rem;
-    height: 330px;
+    height: 367px;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: var(--terciary-color) transparent;

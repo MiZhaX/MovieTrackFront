@@ -13,6 +13,5 @@ const props = defineProps({
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 70vh;
 }
 </style>

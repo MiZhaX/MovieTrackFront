@@ -47,4 +47,11 @@ function setDefaultImage() {
 .biografia {
   text-align: justify;
 }
+
+@media (max-width: 425px) {
+  .director-card {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
 </style>

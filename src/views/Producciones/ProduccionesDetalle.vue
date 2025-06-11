@@ -1,7 +1,8 @@
 <template>
-    <div class="contenedor">
-        <Loading :cargando="cargando"></Loading>
-        <div v-if="!cargando && produccion" class="detalles">
+    <div class="relleno"></div>
+    <Loading :cargando="cargando"></Loading>
+    <div v-if="!cargando && produccion" class="contenedor">
+        <div class="detalles">
             <h2 class="titulo">{{ produccion.titulo }}</h2>
             <div class="detalles d-flex flex-column">
                 <div class="resumenDetalles">
@@ -68,7 +69,8 @@
                         <div class="acciones mt-4 d-flex justify-content-between">
                             <div class="botones d-flex">
                                 <button class="btn me-2 btn-primary" @click="puntuarProduccion">Puntuar</button>
-                                <button class="btn me-2 btn-primary" @click="abrirModalLista">Añadir a lista</button>
+                                <button class="btn me-2 btn-primary" @click="abrirModalLista">Añadir a
+                                    lista</button>
                             </div>
                             <div class="marcas">
                                 <button :class="['btn', 'me-2', visualizada ? 'btn-secondary' : 'btn-primary']"
@@ -324,7 +326,6 @@ async function comprobarMarca() {
 
             await comprobarMarca();
         }
-        console.log(marca.value)
     } catch (error) {
         console.error('Error comprobando marca:', error);
     } finally {
@@ -371,19 +372,23 @@ function puntuarProduccion() {
 </script>
 
 <style scoped>
+.relleno {
+    min-height: 12vh;
+}
+
 .titulo {
     text-align: center;
     margin-top: 1rem;
 }
 
 .contenedor {
-    padding-top: 6rem;
+    margin: 0 auto;
     margin-left: 10rem;
     margin-right: 10rem;
-    min-height: 92.2vh;
     background-color: var(--cuaternary-color);
     padding-bottom: 1rem;
-    padding-bottom: 4rem;
+    border-radius: 10px;
+    padding-bottom: 3rem;
 }
 
 .resumenDetalles {
@@ -392,7 +397,6 @@ function puntuarProduccion() {
     align-items: center;
     margin-left: 4rem;
     margin-right: 4rem;
-    margin-top: 1.5rem;
 }
 
 .infoDetalles {
@@ -433,17 +437,17 @@ function puntuarProduccion() {
 .reparto-lista {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.5rem;
+    gap: 1rem;
     margin-top: 1rem;
 }
 
 #produccionTabContent {
-    background: var(--primary-color);
-    border: 3px solid var(--secondary-color);
+    border-top: 3px solid var(--secondary-color);
+    border-bottom: 3px solid var(--secondary-color);
     padding-left: 1.5rem;
     padding-right: 1.5rem;
-    height: 330px;
-    overflow-y: auto;
+    height: 305px;
+    overflow-x: auto;
     scrollbar-width: thin;
     scrollbar-color: var(--terciary-color) transparent;
 }
@@ -491,5 +495,104 @@ function puntuarProduccion() {
 .form-select:focus {
     border-color: none;
     box-shadow: none;
+}
+
+@media (max-width: 1270px) {
+    .contenedor {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        margin-left: 7rem;
+        margin-right: 7rem;
+        padding-bottom: 1rem;
+    }
+
+    .poster {
+        width: 240px;
+    }
+
+    .infoDetalles {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .resumenDetalles {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .contenedor {
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+        margin-left: 4rem;
+        margin-right: 4rem;
+    }
+}
+
+@media (max-width: 425px) {
+    .contenedor {
+        margin-top: 0rem;
+        margin-bottom: 0rem;
+        margin-left: 0;
+        margin-right: 0;
+        padding-bottom: 1rem;
+        border-radius: 0px;
+    }
+
+    .poster {
+        width: 210px;
+    }
+
+    .infoDetalles {
+        flex-direction: column;
+        align-items: center;
+        margin-left: 2rem;
+        margin-right: 2rem;
+    }
+
+    #produccionTab {
+        font-size: smaller;
+    }
+
+    #produccionTabContent {
+        font-size: smaller;
+        height: 280px;
+    }
+
+    .reparto-lista {
+        flex-wrap: nowrap;
+    }
+
+    .botones {
+        gap: 5px;
+    }
+
+    .marcas {
+        display: flex;
+        gap: 5px;
+    }
+
+    .me-2 {
+        margin-right: 0 !important;
+    }
+}
+
+@media (max-width: 415px) {
+    .infoDetalles {
+        margin-left: 1.5rem;
+        margin-right: 1.5rem;
+    }
+
+    .botones {
+        align-items: center;
+    }
+
+    .btn-primary {
+        font-size: smaller !important;
+    }
+
+    .marcas {
+        align-items: center;
+    }
 }
 </style>

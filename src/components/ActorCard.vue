@@ -35,8 +35,14 @@ function setDefaultImage() {
   text-align: center;
 }
 .persona-card img {
-  width: 100%;
+  width: 140px;
   border-radius: 8px;
   object-fit: cover;
+}
+
+@media (max-width: 425px) {
+  .persona-card img {
+    width: 100px;
+  }
 }
 </style>
