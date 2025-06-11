@@ -578,6 +578,14 @@ function puntuarProduccion() {
 }
 
 @media (max-width: 415px) {
+    .titulo {
+        margin-right: 0.2rem;
+    }
+
+    .tituloOriginal {
+        text-align: center !important;
+    }
+
     .infoDetalles {
         margin-left: 1.5rem;
         margin-right: 1.5rem;
