@@ -40,25 +40,16 @@
                 </div>
             </div>
         </div>
-        <div class="modal fade" id="modalBorrarLista" tabindex="-1" aria-labelledby="modalBorrarListaLabel"
-            aria-hidden="true" ref="modalBorrarListaRef">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalBorrarListaLabel">Eliminar lista</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>¿Estás seguro de que deseas eliminar esta lista? Esta acción no se puede deshacer.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                        <button type="button" class="btn btn-danger" @click="borrarListaConfirmada">Sí,
-                            eliminar</button>
-                    </div>
-                </div>
+        <Dialog v-model:visible="dialogBorrarVisible" modal header="Eliminar lista" :style="{ width: '400px' }">
+            <div>
+                <p>¿Estás seguro de que deseas eliminar esta lista? Esta acción no se puede deshacer.</p>
             </div>
-        </div>
+            <template #footer>
+                <button type="button" class="btn btn-secondary" @click="dialogBorrarVisible = false">No</button>
+                <button type="button" class="btn btn-primary" @click="borrarListaConfirmada">Sí, eliminar</button>
+            </template>
+        </Dialog>
+        <Toast group="br" position="bottom-right" />
     </main>
 </template>
 
@@ -69,6 +60,8 @@ import axios from 'axios'
 import ProductionCard from '@/components/ProductionCard.vue'
 import Loading from '@/components/UI/Loading.vue'
 import { Modal } from 'bootstrap'
+import { useToast } from 'primevue/usetoast';
+import Dialog from 'primevue/dialog';
 
 const route = useRoute()
 const router = useRouter()
@@ -80,6 +73,8 @@ const modoEdicion = ref(false)
 const lista = ref([])
 const usuarioId = ref([])
 const modalBorrarListaRef = ref(null)
+const toast = useToast();
+const dialogBorrarVisible = ref(false);
 
 async function fetchProduccionesLista() {
     cargando.value = true
@@ -122,16 +117,14 @@ async function eliminarProduccionLista(produccionListaId) {
             }
         )
         producciones.value = producciones.value.filter(p => p.id !== produccionListaId)
+        toast.add({ severity: 'success', summary: 'Éxito', detail: 'Producción eliminada de la lista correctamente.', life: 3000, group: 'br' });
     } catch (error) {
-        alert('No se pudo eliminar la producción de la lista.')
+        toast.add({ severity: 'warn', summary: 'Atención', detail: 'No se pudo eliminar la producción de la lista.', life: 3000, group: 'br' });
     }
 }
 
 function abrirModalBorrarLista() {
-    if (modalBorrarListaRef.value) {
-        const modal = Modal.getOrCreateInstance(modalBorrarListaRef.value)
-        modal.show()
-    }
+    dialogBorrarVisible.value = true;
 }
 
 async function borrarListaConfirmada() {
@@ -146,13 +139,11 @@ async function borrarListaConfirmada() {
                 }
             }
         )
-        if (modalBorrarListaRef.value) {
-            const modal = Modal.getOrCreateInstance(modalBorrarListaRef.value)
-            modal.hide()
-        }
-        router.push(`/perfil/${usuarioId}`)
+        dialogBorrarVisible.value = false; // Cierra el Dialog
+        toast.add({ severity: 'success', summary: 'Éxito', detail: 'Lista eliminada correctamente', life: 3000, group: 'br' });
+        router.push(`/perfil/${usuarioId.value.id}`)
     } catch (error) {
-        alert('No se pudo eliminar la lista.')
+        toast.add({ severity: 'warn', summary: 'Atención', detail: 'No se pudo eliminar la lista.', life: 3000, group: 'br' });
     }
 }
 
@@ -237,15 +228,5 @@ onMounted(() => {
 
 .modal-content {
     background-color: var(--primary-color);
-}
-
-.btn-danger {
-    background-color: var(--terciary-color);
-    border-color: var(--terciary-color);
-}
-
-.btn-danger:hover {
-    background-color: var(--var-terciary-color);
-    border-color: var(--var-terciary-color);
 }
 </style>

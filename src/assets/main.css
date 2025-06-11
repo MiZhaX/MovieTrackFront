@@ -1,35 +1,23 @@
-@import './base.css';
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+.p-dialog {
+  width: 400px !important;
+  background-color: var(--secondary-color) !important;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+.p-button-text.p-button-secondary{
+  color: black !important;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+.p-button-text.p-button-secondary:hover{
+  color: var(--terciary-color) !important;
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
+.btn-primary {
+    background-color: var(--terciary-color);
+    border-color: var(--terciary-color);
+    color: black;
+}
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+.btn-primary:hover {
+    background-color: var(--var-terciary-color);
+    border-color: var(--var-terciary-color);
 }

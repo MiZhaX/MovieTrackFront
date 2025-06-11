@@ -38,8 +38,8 @@
                             </button>
                         </div>
                         <div v-if="user.playlists && user.playlists.length > 0" class="listas-scroll">
-                            <RouterLink v-for="lista in user.playlists" :key="lista.id" :to="`/listas/${lista.nombre}/${lista.id}`"
-                                class="lista-card">
+                            <RouterLink v-for="lista in user.playlists" :key="lista.id"
+                                :to="`/listas/${lista.nombre}/${lista.id}`" class="lista-card">
                                 <div class="lista-card-img">
                                     <font-awesome-icon :icon="['fas', 'list']" size="2x" />
                                 </div>
@@ -75,42 +75,35 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="modalNuevaLista" tabindex="-1" aria-labelledby="modalNuevaListaLabel" aria-hidden="true"
-        ref="modalRef">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form @submit.prevent="crearLista" class="modal-form">
-                    <div class="modal-header">
-                        <h5 class="modal-title text-center" id="modalNuevaListaLabel">Crear nueva lista</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="nombreLista" class="form-label">Nombre</label>
-                            <input type="text" class="form-control" id="nombreLista" v-model="nuevaLista.nombre"
-                                required maxlength="50">
-                        </div>
-                        <div class="mb-3">
-                            <label for="descripcionLista" class="form-label">Descripción</label>
-                            <textarea class="form-control" id="descripcionLista" v-model="nuevaLista.descripcion"
-                                rows="3" maxlength="255"></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Crear</button>
-                    </div>
-                </form>
+    <Dialog v-model:visible="dialogVisible" modal header="Crear nueva lista">
+        <form @submit.prevent="crearLista" class="modal-form">
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="nombreLista" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="nombreLista" v-model="nuevaLista.nombre" required
+                        maxlength="50">
+                </div>
+                <div class="mb-3">
+                    <label for="descripcionLista" class="form-label">Descripción</label>
+                    <textarea class="form-control" id="descripcionLista" v-model="nuevaLista.descripcion" rows="3"
+                        maxlength="255"></textarea>
+                </div>
             </div>
-        </div>
-    </div>
+            <div class="modal-footer d-flex gap-2">
+                <button type="button" class="btn btn-secondary" @click="dialogVisible = false">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Crear</button>
+            </div>
+        </form>
+    </Dialog>
+    <Toast group="br" position="bottom-right" />
 </template>
 
 <script setup>
 import Loading from '@/components/UI/Loading.vue';
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
-import { Modal } from 'bootstrap'
+import Dialog from 'primevue/dialog'
+import { useToast } from 'primevue/usetoast';
 
 const user = ref({
     name: '',
@@ -124,6 +117,8 @@ const user = ref({
 const visualizadas = ref([]);
 const quieroVer = ref([]);
 const cargando = ref(true);
+const dialogVisible = ref(false);
+const toast = useToast();
 
 const tab = ref('visualizadas')
 
@@ -139,12 +134,9 @@ const nuevaLista = ref({
 const modalRef = ref(null);
 
 function abrirModal() {
-    if (modalRef.value) {
-        const modal = Modal.getOrCreateInstance(modalRef.value)
-        modal.show()
-    }
-    nuevaLista.value.nombre = ''
-    nuevaLista.value.descripcion = ''
+    dialogVisible.value = true;
+    nuevaLista.value.nombre = '';
+    nuevaLista.value.descripcion = '';
 }
 
 async function crearLista() {
@@ -153,13 +145,13 @@ async function crearLista() {
         const token = localStorage.getItem('token')
         const localUser = localStorage.getItem('user')
         if (!localUser) return []
-        const user = JSON.parse(localUser)
+        const userParse = JSON.parse(localUser)
         await axios.post(
             'https://movietrackapi.up.railway.app/api/v1/listasPersonalizadas',
             {
                 nombre: nuevaLista.value.nombre,
                 descripcion: nuevaLista.value.descripcion,
-                usuario_id: user.id
+                usuario_id: userParse.id
             },
             {
                 headers: {
@@ -167,16 +159,12 @@ async function crearLista() {
                 }
             }
         );
-        // Cerrar modal
-        if (window.bootstrap && modalRef.value) {
-            const modal = window.bootstrap.Modal.getInstance(modalRef.value);
-            modal.hide();
-        }
-
-        window.location.reload();
+        dialogVisible.value = false;
+        const listasActualizadas = await fetchListasReproduccion();
+        user.value.playlists = listasActualizadas.data || listasActualizadas
+        toast.add({ severity: 'success', summary: 'Lista creada', detail: 'Lista creada correctamente', life: 3000, group: 'br' });
     } catch (error) {
-        alert('Error al crear la lista');
-        console.error(error);
+        toast.add({ severity: 'warn', summary: 'Error', detail: 'Error al crear la lista', life: 3000, group: 'br' });
     }
 }
 
@@ -214,12 +202,11 @@ onMounted(async () => {
                 title: marca.titulo || '',
             }))
         } catch (e) {
-            console.error(e)
+            toast.add({ severity: 'warn', summary: 'Error', detail: e.response?.data?.message || 'Error al cargar datos del usuario', life: 3000, group: 'br' });
         } finally {
             cargando.value = false;
         }
     }
-    console.log('User data:', user.value)
 })
 
 function formatearFecha(fechaIso) {
@@ -243,7 +230,7 @@ async function fetchProduccionesFavoritas() {
         })
         return response.data.data || []
     } catch (error) {
-        console.error('Error al obtener favoritas:', error)
+        toast.add({ severity: 'warn', summary: 'Error', detail: e.response?.data?.message || 'Error al obtener películas favoritas', life: 3000, group: 'br' });
         return []
     }
 }
@@ -262,7 +249,7 @@ async function fetchProduccionesVistas() {
         })
         return response.data.data || []
     } catch (error) {
-        console.error('Error al obtener vistas:', error)
+        toast.add({ severity: 'warn', summary: 'Error', detail: e.response?.data?.message || 'Error al obtener películas visualizadas', life: 3000, group: 'br' });
         return []
     }
 }
@@ -281,7 +268,7 @@ async function fetchProduccionesPorVer() {
         })
         return response.data.data || []
     } catch (error) {
-        console.error('Error al obtener vistas:', error)
+        toast.add({ severity: 'warn', summary: 'Error', detail: e.response?.data?.message || 'Error al obtener peliculas por ver', life: 3000, group: 'br' });
         return []
     }
 }
@@ -300,7 +287,7 @@ async function fetchListasReproduccion() {
         })
         return response.data.data || []
     } catch (error) {
-        console.error('Error al obtener vistas:', error)
+        toast.add({ severity: 'warn', summary: 'Error', detail: e.response?.data?.message || 'Error al obtener listas personalizadas', life: 3000, group: 'br' });
         return []
     }
 }
@@ -457,7 +444,7 @@ async function fetchListasReproduccion() {
 
 .modal-form {
     background: var(--secondary-color);
-    border-radius: 10px;    
+    border-radius: 10px;
 }
 
 .perfil-bottom {
@@ -523,8 +510,6 @@ async function fetchListasReproduccion() {
     overflow-y: auto;
 }
 
-
-
 .pelicula-card img {
     width: 120px;
     object-fit: cover;
@@ -533,13 +518,8 @@ async function fetchListasReproduccion() {
     border: 1px solid #bbb;
 }
 
-.btn-primary {
-    background-color: var(--terciary-color);
-    border-color: var(--terciary-color);
-}
-
-.btn-primary:hover {
-    background-color: var(--var-terciary-color);
-    border-color: var(--var-terciary-color);
+.form-control:focus {
+    border: none;
+    box-shadow: none;
 }
 </style>

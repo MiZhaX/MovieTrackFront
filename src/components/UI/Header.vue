@@ -173,6 +173,7 @@ async function logout() {
     padding-left: 0.3rem;
     padding-right: 0.3rem;
     margin: 1rem;
+    cursor: pointer;
 }
 
 .inicioSesion:hover {

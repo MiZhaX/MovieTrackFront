@@ -30,40 +30,19 @@
                 <button type="submit">{{ isLogin ? 'Iniciar sesión' : 'Registrarse' }}</button>
             </form>
         </div>
-
-        <div class="toast-container position-fixed bottom-0 end-0 p-3">
-            <div
-                class="toast align-items-center text-white"
-                :class="toastClass"
-                role="alert"
-                ref="toast"
-                aria-live="assertive"
-                aria-atomic="true"
-            >
-                <div class="d-flex">
-                    <div class="toast-body">
-                        {{ toastMessage }}
-                    </div>
-                    <button
-                        type="button"
-                        class="btn-close btn-close-white me-2 m-auto"
-                        data-bs-dismiss="toast"
-                        aria-label="Close"
-                    ></button>
-                </div>
-            </div>
-        </div>
+        <Toast group="br" position="bottom-right"/>
     </div>
 </template>
 
 <script setup>
 import { ref, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
+import { useToast } from 'primevue/usetoast';
 import axios from 'axios'
-import { Toast } from 'bootstrap'
 
 const isLogin = ref(true)
 const router = useRouter()
+const toast = useToast();
 
 const form = ref({
     nombre: '',
@@ -71,18 +50,6 @@ const form = ref({
     password: '',
     password_confirmation: ''
 })
-
-const toast = ref(null)
-const toastMessage = ref('')
-const toastClass = ref('bg-danger')
-
-async function showToast(message, success = false) {
-    toastMessage.value = message
-    toastClass.value = success ? 'bg-success' : 'bg-danger'
-    await nextTick() 
-    const toastInstance = Toast.getOrCreateInstance(toast.value)
-    toastInstance.show()
-}
 
 async function login() {
     try {
@@ -94,10 +61,10 @@ async function login() {
         localStorage.setItem('user', JSON.stringify(res.data.user))
         localStorage.setItem('token', res.data.token)
 
-        showToast('Sesión iniciada correctamente', true)
+        toast.add({ severity: 'success', summary: 'Éxito', detail: 'Sesión iniciada correctamente', life: 3000, group: 'br' });
         setTimeout(() => router.push('/'), 1500)
     } catch (e) {
-        showToast(e.response?.data?.message || 'Error al iniciar sesión')
+        toast.add({ severity: 'warn', summary: 'Error', detail: e.response?.data?.message || 'Error al iniciar sesión', life: 3000, group: 'br' });
     }
 }
 
@@ -110,12 +77,12 @@ async function register() {
             password_confirmation: form.value.password_confirmation
         }, { withCredentials: true })
 
-        showToast('¡Registro exitoso! Ahora puedes iniciar sesión.', true)
+        toast.add({ severity: 'success', summary: 'Éxito', detail: '¡Registro exitoso! Ahora puedes iniciar sesión', life: 3000, group: 'br' });
         setTimeout(() => {
             isLogin.value = true
         }, 1800)
     } catch (e) {
-        showToast(e.response?.data?.message || 'Error al registrarse')
+        toast.add({ severity: 'warn', summary: 'Error', detail: e.response?.data?.message || 'Error al registrarse', life: 3000, group: 'br' });
     }
 }
 

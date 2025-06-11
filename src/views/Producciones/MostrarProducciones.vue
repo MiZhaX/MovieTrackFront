@@ -1,6 +1,22 @@
+<template>
+    <div class="contenedor">
+        <Loading :cargando="cargando"></Loading>
+        <div v-if="!cargando">
+            <Filters></Filters>
+            <div class="producciones">
+                <div class="grid">
+                    <ProduccionCard v-for="p in producciones" :key="p.id" :produccion="p" :tamano="200"/>
+                </div>
+            </div>
+            <Pagination :currentPage="currentPage" :lastPage="lastPage" @cambiar-pagina="fetchProducciones" />
+        </div>
+        <Toast group="br" position="bottom-right" />
+    </div>
+</template>
 <script setup>
 import { onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { useToast } from 'primevue/usetoast';
 import axios from 'axios';
 import ProduccionCard from '@/components/ProductionCard.vue';
 import Pagination from '@/components/UI/Pagination.vue';
@@ -13,6 +29,7 @@ const producciones = ref([]);
 const cargando = ref(true);
 const currentPage = ref(1);
 const lastPage = ref(1);
+const toast = useToast();
 
 const fetchProducciones = async (page = 1) => {
     cargando.value = true;
@@ -26,7 +43,7 @@ const fetchProducciones = async (page = 1) => {
         currentPage.value = response.data.meta.current_page;
         lastPage.value = response.data.meta.last_page;
     } catch (error) {
-        console.error('Error al cargar producciones:', error);
+        toast.add({ severity: 'warn', summary: 'Error', detail: 'Error al obtener los datos de las producciones.', life: 3000, group: 'br' });
     } finally {
         cargando.value = false;
     }
@@ -36,21 +53,6 @@ onMounted(() => fetchProducciones());
 
 watch(() => route.path, () => fetchProducciones(1));
 </script>
-
-<template>
-    <div class="contenedor">
-        <Loading :cargando="cargando"></Loading>
-        <div v-if="!cargando">
-            <Filters></Filters>
-            <div class="producciones">
-                <div class="grid">
-                    <ProduccionCard v-for="p in producciones" :key="p.id" :produccion="p" :tamano="200"/>
-                </div>
-            </div>
-            <Pagination :currentPage="currentPage" :lastPage="lastPage" @cambiar-pagina="fetchProducciones" />
-        </div>
-    </div>
-</template>
 <style scoped>
 .grid {
     display: grid;

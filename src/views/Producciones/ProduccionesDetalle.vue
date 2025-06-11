@@ -72,15 +72,18 @@
                             </div>
                             <div class="marcas">
                                 <button :class="['btn', 'me-2', visualizada ? 'btn-secondary' : 'btn-primary']"
-                                    @click="marcarProduccion({ marcaParam: visualizada ? 0 : 1 })" title="Visualizada">
+                                    @click="marcarProduccion({ marcaParam: visualizada ? 0 : 1 })"
+                                    v-tooltip.top="'Visualizada'">
                                     <font-awesome-icon :icon="visualizada ? 'eye-slash' : 'eye'" />
                                 </button>
                                 <button :class="['btn', 'me-2', quieroVer ? 'btn-secondary' : 'btn-primary']"
-                                    @click="marcarProduccion({ marcaParam: quieroVer ? 0 : 2 })" title="Quiero ver">
+                                    @click="marcarProduccion({ marcaParam: quieroVer ? 0 : 2 })"
+                                    v-tooltip.top="'Quiero ver'">
                                     <font-awesome-icon :icon="quieroVer ? 'clock' : 'stopwatch'" />
                                 </button>
                                 <button :class="['btn', 'me-2', esFavorita ? 'btn-secondary' : 'btn-primary']"
-                                    @click="marcarProduccion({ favorita: esFavorita ? 0 : 1 })" title="Favorita">
+                                    @click="marcarProduccion({ favorita: esFavorita ? 0 : 1 })"
+                                    v-tooltip.top="'Favorita'">
                                     <font-awesome-icon :icon="esFavorita ? ['fas', 'star'] : ['far', 'star']" />
                                 </button>
                             </div>
@@ -90,36 +93,29 @@
             </div>
         </div>
     </div>
-
-    <div class="modal fade" id="modalListas" tabindex="-1" aria-labelledby="modalListasLabel" aria-hidden="true" ref="modalListasRef">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <form @submit.prevent="añadirALista">
-            <div class="modal-header">
-              <h5 class="modal-title" id="modalListasLabel">Añadir a lista</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
+    <Toast group="br" position="bottom-right" />
+    <Dialog v-model:visible="dialogVisible" modal header="Añadir a lista">
+        <form @submit.prevent="añadirALista">
             <div class="modal-body">
-              <div v-if="listasPersonalizadas.length > 0">
-                <select id="selectLista" v-model="listaSeleccionada" class="form-select" required>
-                  <option value="">Selecciona una lista</option>
-                  <option v-for="lista in listasPersonalizadas" :key="lista.id" :value="lista.id">
-                    {{ lista.nombre }}
-                  </option>
-                </select>
-              </div>
-              <div v-else>
-                <p>No tienes listas de reproducción. Crea una desde tu perfil.</p>
-              </div>
+                <div v-if="listasPersonalizadas.length > 0">
+                    <select id="selectLista" v-model="listaSeleccionada" class="form-select" required>
+                        <option value="">Selecciona una lista</option>
+                        <option v-for="lista in listasPersonalizadas" :key="lista.id" :value="lista.id">
+                            {{ lista.nombre }}
+                        </option>
+                    </select>
+                </div>
+                <div v-else>
+                    <p>No tienes listas de reproducción. Crea una desde tu perfil.</p>
+                </div>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-              <button type="submit" class="btn btn-primary" :disabled="!listaSeleccionada || !listasPersonalizadas.length">Añadir</button>
+            <div class="modal-footer mt-3 d-flex gap-2">
+                <button type="button" class="btn btn-secondary" @click="dialogVisible = false">Cancelar</button>
+                <button type="submit" class="btn btn-primary"
+                    :disabled="!listaSeleccionada || !listasPersonalizadas.length">Añadir</button>
             </div>
-          </form>
-        </div>
-      </div>
-    </div>
+        </form>
+    </Dialog>
 </template>
 
 <script setup>
@@ -130,6 +126,14 @@ import Loading from '@/components/UI/Loading.vue';
 import ActorCard from '@/components/ActorCard.vue';
 import DirectorCard from '@/components/DirectorCard.vue';
 import { Modal } from 'bootstrap';
+import { useToast } from 'primevue/usetoast';
+import Dialog from 'primevue/dialog';
+import ScrollPanel from 'primevue/scrollpanel';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
+import TabPanels from 'primevue/tabpanels';
+import TabPanel from 'primevue/tabpanel';
 
 const route = useRoute();
 const produccion = ref(null);
@@ -142,16 +146,16 @@ const quieroVer = ref(false);
 const marca = ref(null);
 const imgRef = ref(null);
 
+const dialogVisible = ref(false);
 const listasPersonalizadas = ref([]);
 const modalListasRef = ref(null);
 const listaSeleccionada = ref('');
+const toast = useToast();
+
 
 function abrirModalLista() {
     listaSeleccionada.value = '';
-    if (modalListasRef.value) {
-        const modal = Modal.getOrCreateInstance(modalListasRef.value);
-        modal.show();
-    }
+    dialogVisible.value = true;
 }
 
 async function añadirALista() {
@@ -170,13 +174,10 @@ async function añadirALista() {
                 }
             }
         );
-        if (modalListasRef.value) {
-            const modal = Modal.getOrCreateInstance(modalListasRef.value);
-            modal.hide();
-        }
-        alert('Producción añadida a la lista correctamente.');
+        toast.add({ severity: 'success', summary: 'Éxito', detail: 'Producción añadida a la lista correctamente.', life: 3000, group: 'br' });
+        dialogVisible.value = false;
     } catch (error) {
-        alert('Ya existe esta producción en la lista');
+        toast.add({ severity: 'warn', summary: 'Atención', detail: 'Ya existe esta producción en la lista.', life: 3000, group: 'br' });
         console.error(error);
     }
 }
@@ -354,7 +355,7 @@ async function marcarProduccion({ marcaParam = undefined, favorita = undefined }
         // Actualiza el estado local tras marcar
         await comprobarMarca();
     } catch (error) {
-        alert('Error al marcar la producción.');
+        toast.add({ severity: 'warn', summary: 'Error', detail: 'Error al marcar producción', life: 3000, group: 'br' });
         console.error(error);
     }
 }
@@ -468,19 +469,19 @@ function puntuarProduccion() {
 }
 
 .btn-primary:hover {
-    background-color: var(--secondary-color);
-    border: 1px solid var(--secondary-color);
+    background-color: var(--var-terciary-color);
+    border: 1px solid var(--var-terciary-color);
 }
 
 .btn-secondary {
-    background-color: var(--secondary-color);
-    border: 1px solid var(--secondary-color);
+    background-color: var(--var-cuaternary-color);
+    border: 1px solid var(--var-cuaternary-color);
     color: black;
 }
 
 .btn-secondary:hover {
-    background-color: var(--terciary-color);
-    border: 1px solid var(--terciary-color);
+    background-color: var(--var-quintary-color);
+    border: 1px solid var(--var-quintary-color);
 }
 
 .form-select {
