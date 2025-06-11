@@ -171,13 +171,13 @@ watch(() => route.path, () => fetchProducciones(1));
     }
 }
 
-@media (max-width: 375px) {
+@media (max-width: 415px) {
     .contenedor {
         padding-top: 6rem;
     }
 
     .gridPeliculas {
-        grid-template-columns: repeat(3, minmax(115px, 1fr));
+        grid-template-columns: repeat(3, minmax(110px, 1fr));
     }
 }
 

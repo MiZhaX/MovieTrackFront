@@ -126,7 +126,6 @@ const peliculasFiltradas = computed(() =>
     tab.value === 'visualizadas' ? visualizadas.value : quieroVer.value
 )
 
-// Modal y formulario
 const nuevaLista = ref({
     nombre: '',
     descripcion: ''
@@ -521,5 +520,12 @@ async function fetchListasReproduccion() {
 .form-control:focus {
     border: none;
     box-shadow: none;
+}
+
+@media (max-width: 1024px) {
+ .perfil-main {
+    margin-left: 7rem;
+    margin-right: 7rem;
+ }
 }
 </style>

@@ -1,9 +1,7 @@
 <template>
   <div class="ranking-container container my-5">
-    <h2 class="text-center mb-4">RANKING</h2>
-
-    <div v-if="loading" class="text-center">Cargando...</div>
-    <div v-else>
+    <Loading :cargando="loading" />
+    <div v-if="!loading">
       <div v-for="(produccion, index) in producciones" :key="produccion.id" class="card mb-4">
         <div class="row g-0">
           <div class="col-md-3 d-flex align-items-center justify-content-center p-2">
@@ -37,6 +35,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import axios from 'axios'
+import Loading from '@/components/UI/Loading.vue'
 
 const producciones = ref([])
 const loading = ref(true)
@@ -76,10 +75,17 @@ onMounted(async () => {
 
 <style scoped>
 .ranking-container {
-  background-color: var(--cuaternary-color);
   border-radius: 10px;
-  padding: 2rem;
   padding-top: 5.5rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.titulo {
+  padding: 0.5rem;
+  border-radius: 10px;
+  background-color: var(--cuaternary-color);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .card {

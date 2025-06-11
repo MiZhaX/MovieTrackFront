@@ -79,9 +79,9 @@ function setDefaultImage() {
   }
 }
 
-@media (max-width: 375px) {
+@media (max-width: 415px) {
   .produccion-card {
-    width: 100px !important;
+    width: 110px !important;
   }
 
   .titulo {

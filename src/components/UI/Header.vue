@@ -19,7 +19,7 @@
                 </div>
 
                 <button class="menu-toggle d-md-none" @click="toggleMenu">
-                    <i :class="menuOpen ? 'pi pi-times' : 'pi pi-bars'"></i>
+                    <i :class="'pi pi-bars'"></i>
                 </button>
             </div>
 

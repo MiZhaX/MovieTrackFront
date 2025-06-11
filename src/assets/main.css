@@ -17,6 +17,10 @@
   border-radius: 5px !important;
 }
 
+.card {
+  background-color: var(--cuaternary-color);
+}
+
 .btn-primary {
     background-color: var(--terciary-color);
     border-color: var(--terciary-color);
