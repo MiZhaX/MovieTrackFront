@@ -11,6 +11,12 @@
   color: var(--terciary-color) !important;
 }
 
+.p-menu-list {
+  background-color: var(--secondary-color) !important;
+  border: 2px solid var(--terciary-color) !important;
+  border-radius: 5px !important;
+}
+
 .btn-primary {
     background-color: var(--terciary-color);
     border-color: var(--terciary-color);

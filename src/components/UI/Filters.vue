@@ -25,7 +25,7 @@
     border-radius: 10px;
     border: 1px solid var(--cuaternary-color);
 
-    width: 100%;
+    /* width: 100%; */
     text-align: center;
     outline: none;
 }

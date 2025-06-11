@@ -122,4 +122,32 @@ onBeforeUnmount(() => {
     height: auto;
     border-radius: 4px;
 }
+
+@media (max-width: 930px) {
+    .input {
+        font-size: smaller;
+        width: 350px;
+    }
+}
+
+@media (max-width: 768px) {
+    .input {
+        font-size: smaller;
+        width: 300px;
+    }
+}
+
+@media (max-width: 425px) {
+    .input {
+        font-size: smaller;
+        width: 270px;
+    }
+}
+
+@media (max-width: 320px) {
+    .input {
+        font-size: smaller;
+        width: 250px;
+    }
+}
 </style>

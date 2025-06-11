@@ -1,12 +1,9 @@
 <template>
-  <div class="produccion-card" :style="{ width: props.tamano + 'px'}">
-    <RouterLink :to="`/producciones/${produccion.id}`"><img
-      :src="posterPath"
-      :alt="produccion.titulo"
-      @error="setDefaultImage"
-      ref="imgRef"
-    /></RouterLink>
-    <p class="titulo m-0">{{ produccion.titulo }} <span v-if="detalles">- {{ produccion.puntuacion_critica }}⭐</span></p>
+  <div class="produccion-card" :style="{ width: props.tamano + 'px' }">
+    <RouterLink :to="`/producciones/${produccion.id}`"><img :src="posterPath" :alt="produccion.titulo"
+        @error="setDefaultImage" ref="imgRef" /></RouterLink>
+    <p class="titulo m-0">{{ produccion.titulo }} <span v-if="detalles">- {{ produccion.puntuacion_critica }}⭐</span>
+    </p>
   </div>
 </template>
 
@@ -37,6 +34,7 @@ function setDefaultImage() {
 .produccion-card {
   text-align: center;
 }
+
 .produccion-card img {
   width: 100%;
   border-radius: 8px;
@@ -46,5 +44,48 @@ function setDefaultImage() {
 .titulo {
   color: black;
   font-weight: 500;
+}
+
+@media (max-width: 1450px) {
+  .produccion-card {
+    width: 160px !important;
+  }
+
+  .titulo {
+    margin-bottom: 1rem !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .titulo {
+    font-size: 15px;
+    margin-bottom: 1rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .produccion-card {
+    width: 160px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .produccion-card {
+    width: 130px !important;
+  }
+
+  .titulo {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 375px) {
+  .produccion-card {
+    width: 100px !important;
+  }
+
+  .titulo {
+    font-size: 13px;
+  }
 }
 </style>

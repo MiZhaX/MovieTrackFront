@@ -4,8 +4,8 @@
         <div v-if="!cargando">
             <Filters></Filters>
             <div class="producciones">
-                <div class="grid">
-                    <ProduccionCard v-for="p in producciones" :key="p.id" :produccion="p" :tamano="200"/>
+                <div class="gridPeliculas">
+                    <ProduccionCard v-for="p in producciones" :key="p.id" :produccion="p" :tamano="200" :detalles="false"/>
                 </div>
             </div>
             <Pagination :currentPage="currentPage" :lastPage="lastPage" @cambiar-pagina="fetchProducciones" />
@@ -54,7 +54,7 @@ onMounted(() => fetchProducciones());
 watch(() => route.path, () => fetchProducciones(1));
 </script>
 <style scoped>
-.grid {
+.gridPeliculas {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 16px;
@@ -62,11 +62,132 @@ watch(() => route.path, () => fetchProducciones(1));
 }
 
 .contenedor {
-    padding-top: 6rem;
+    padding-top: 7rem;
     margin-left: 10rem;
     margin-right: 10rem;
     min-height: 92.2vh;
     background-color: var(--cuaternary-color);
     padding-bottom: 1rem;
+}
+
+@media (min-width: 1441px) {
+    .gridPeliculas {
+        grid-template-columns: repeat(5, minmax(200px, 1fr));
+    }
+
+    .contenedor {
+        margin-left: 16rem;
+        margin-right: 16rem;
+    }
+}
+
+@media (max-width: 1440px) {
+    .gridPeliculas {
+        grid-template-columns: repeat(5, minmax(200px, 1fr));
+        gap: 0px;
+    }
+
+    .contenedor {
+        padding-top: 6rem;
+        margin-left: 12rem;
+        margin-right: 12rem;
+    }
+}
+
+@media (max-width: 1300px) {
+    .gridPeliculas {
+        grid-template-columns: repeat(5, minmax(160px, 1fr));
+        gap: 0px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .contenedor {
+        padding-top: 6.2rem;
+        margin-left: 6rem;
+        margin-right: 6rem;
+    }
+
+    .gridPeliculas {
+        grid-template-columns: repeat(5, minmax(160px, 1fr));
+    }
+}
+
+@media (max-width: 1024px) {
+    .contenedor {
+        padding-top: 6rem;
+        margin-left: 4.5rem;
+        margin-right: 4.5rem;
+    }
+
+    .gridPeliculas {
+        grid-template-columns: repeat(35 minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .contenedor {
+        padding-top: 5rem;
+        margin-left: 5rem;
+        margin-right: 5rem;
+    }
+
+    .gridPeliculas {
+        grid-template-columns: repeat(3, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .contenedor {
+        padding-top: 5rem;
+        margin-left: 3rem;
+        margin-right: 3rem;
+    }
+
+    .gridPeliculas {
+        grid-template-columns: repeat(3, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 675px) {
+    .contenedor {
+        padding-top: 7rem;
+    }
+
+    .gridPeliculas {
+        grid-template-columns: repeat(2, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .contenedor {
+        margin-left: 0rem;
+        margin-right: 0rem;
+        padding-top: 6rem;
+    }
+
+    .gridPeliculas {
+        grid-template-columns: repeat(3, minmax(130px, 1fr));
+    }
+}
+
+@media (max-width: 375px) {
+    .contenedor {
+        padding-top: 6rem;
+    }
+
+    .gridPeliculas {
+        grid-template-columns: repeat(3, minmax(115px, 1fr));
+    }
+}
+
+@media (max-width: 320px) {
+    .contenedor {
+        padding-top: 6rem;
+    }
+
+    .gridPeliculas {
+        grid-template-columns: repeat(2, minmax(115px, 1fr));
+    }
 }
 </style>

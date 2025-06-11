@@ -1,6 +1,6 @@
 <template>
   <div class="ranking-container container my-5">
-    <h2 class="text-center mb-4">RANKING TOP 10</h2>
+    <h2 class="text-center mb-4">RANKING</h2>
 
     <div v-if="loading" class="text-center">Cargando...</div>
     <div v-else>
@@ -8,12 +8,8 @@
         <div class="row g-0">
           <div class="col-md-3 d-flex align-items-center justify-content-center p-2">
             <RouterLink :to="`/producciones/${produccion.id}`">
-              <img
-                :src="getPosterPath(produccion.id)"
-                class="img-fluid rounded"
-                :alt="produccion.titulo"
-                @error="handleImageError"
-              />
+              <img :src="getPosterPath(produccion.id)" class="img-fluid rounded" :alt="produccion.titulo"
+                @error="handleImageError" />
             </RouterLink>
           </div>
           <div class="col-md-9">
@@ -21,11 +17,14 @@
               <h5 class="card-title">
                 {{ index + 1 }}. {{ produccion.titulo }}
               </h5>
-              <p class="card-text">
-                {{ produccion.sinopsis}}
+              <p class="card-text"> </p>
+              <p class="card-text sinopsis">
+                {{ produccion.sinopsis }}
               </p>
               <p class="card-text">
-                ⭐ {{ produccion.puntuacion_critica }}
+                <strong class="datos">{{ produccion.titulo_original }} · {{
+                  formatearDuracion(produccion.duracion) }} · {{ obtenerAño(produccion.fecha_estreno) }} · </strong>
+                <strong>⭐ {{ produccion.puntuacion_critica }}</strong>
               </p>
             </div>
           </div>
@@ -50,6 +49,19 @@ const handleImageError = (event) => {
   event.target.src = '/assets/img/default.png'
 }
 
+function formatearDuracion(minutos) {
+  if (!minutos || isNaN(minutos)) return '';
+  const h = Math.floor(minutos / 60);
+  const m = minutos % 60;
+  return `${h}h ${m}m`;
+}
+
+function obtenerAño(fecha) {
+  if (!fecha) return '';
+  const [a] = fecha.split('-');
+  return a;
+}
+
 onMounted(async () => {
   try {
     const res = await axios.get('https://movietrackapi.up.railway.app/api/v1/ranking-critica')
@@ -67,7 +79,7 @@ onMounted(async () => {
   background-color: var(--cuaternary-color);
   border-radius: 10px;
   padding: 2rem;
-  padding-top: 4rem;
+  padding-top: 5.5rem;
 }
 
 .card {
@@ -76,9 +88,31 @@ onMounted(async () => {
 
 .card-title {
   font-weight: bold;
+  text-align: center;
 }
 
 img {
   height: 170px;
+}
+
+@media (max-width: 425px) {
+  .ranking-container {
+    margin-bottom: 0rem !important;
+    border-radius: 0px !important;
+  }
+
+  .card-body {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .card-title {
+    font-size: large;
+  }
+
+  .sinopsis,
+  .datos {
+    display: none;
+  }
 }
 </style>

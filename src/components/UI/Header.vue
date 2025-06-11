@@ -9,17 +9,24 @@
             <div class="navegador">
                 <Buscador />
 
-                <div v-if="!scrolled" class="botones">
-                    <RouterLink to="/peliculas" class="enlace boton" :class="{ activa: isActive('/peliculas') }">Películas</RouterLink>
-                    <RouterLink to="/series" class="enlace boton" :class="{ activa: isActive('/series') }">Series</RouterLink>
-                    <RouterLink to="/ranking" class="enlace boton" :class="{ activa: isActive('/ranking') }">Ranking</RouterLink>
+                <div v-if="!scrolled" class="botones d-none d-md-flex">
+                    <RouterLink to="/peliculas" class="enlace boton" :class="{ activa: isActive('/peliculas') }">
+                        Películas</RouterLink>
+                    <RouterLink to="/series" class="enlace boton" :class="{ activa: isActive('/series') }">Series
+                    </RouterLink>
+                    <RouterLink to="/ranking" class="enlace boton" :class="{ activa: isActive('/ranking') }">Ranking
+                    </RouterLink>
                 </div>
+
+                <button class="menu-toggle d-md-none" @click="toggleMenu">
+                    <i :class="menuOpen ? 'pi pi-times' : 'pi pi-bars'"></i>
+                </button>
             </div>
 
-            <div v-if="!user">
+            <div v-if="!user" class="d-none d-md-flex">
                 <RouterLink to="/login" class="enlace inicioSesion">Iniciar sesión</RouterLink>
             </div>
-            <div v-else class="d-flex align-items-center gap-2">
+            <div v-else class="d-none d-md-flex d-flex align-items-center gap-2">
                 <RouterLink :to="`/perfil/${user.id}`" class="enlace inicioSesion">
                     Mi Perfil
                 </RouterLink>
@@ -27,15 +34,19 @@
                     Cerrar sesión
                 </p>
             </div>
+
+            <Menu :model="menuItems" :popup="true" ref="menu" />
         </div>
     </nav>
 </template>
+
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import '../../assets/css/variables.css'
-import Buscador from './Buscador.vue'
-import axios from 'axios'
+import '../../assets/css/variables.css';
+import Buscador from './Buscador.vue';
+import Menu from 'primevue/menu';
+import axios from 'axios';
 
 const route = useRoute();
 const router = useRouter();
@@ -44,6 +55,36 @@ const scrollY = ref(0);
 const scrolled = ref(false);
 
 const user = ref(null);
+
+const menu = ref(null);
+const menuOpen = ref(false); 
+const menuItems = ref([]);
+
+const toggleMenu = () => {
+    menuOpen.value = !menuOpen.value; 
+    if (menuOpen.value) {
+        menu.value.show(event);
+    } else {
+        menu.value.hide(); 
+    }
+};
+
+const updateMenuItems = () => {
+    menuItems.value = [
+        { label: 'Películas', command: () => router.push('/peliculas') },
+        { label: 'Series', command: () => router.push('/series') },
+        { label: 'Ranking', command: () => router.push('/ranking') },
+        { separator: true },
+        user.value
+            ? { label: 'Mi Perfil', command: () => router.push(`/perfil/${user.value.id}`) }
+            : { label: 'Iniciar sesión', command: () => router.push('/login') },
+        user.value
+            ? { label: 'Cerrar sesión', command: logout }
+            : null,
+    ].filter(item => item && item.label); 
+};
+
+updateMenuItems();
 
 const handleScroll = () => {
     scrollY.value = window.scrollY;
@@ -54,6 +95,7 @@ onMounted(() => {
     window.addEventListener('scroll', handleScroll);
     const userData = localStorage.getItem('user');
     user.value = userData ? JSON.parse(userData) : null;
+    updateMenuItems(); 
 });
 
 onUnmounted(() => {
@@ -65,8 +107,11 @@ watch(
     () => {
         const userData = localStorage.getItem('user');
         user.value = userData ? JSON.parse(userData) : null;
+        updateMenuItems(); 
     }
 );
+
+watch(user, updateMenuItems);
 
 const isActive = (ruta) => {
     return route.path.startsWith(ruta);
@@ -91,6 +136,7 @@ async function logout() {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
         user.value = null;
+        updateMenuItems(); 
         router.push('/');
     }
 }
@@ -102,7 +148,7 @@ async function logout() {
     display: flex;
     justify-content: space-between;
     padding-bottom: 5px;
-    min-height: 13vh;
+    min-height: 12vh;
     transition: all 0.3s ease;
     align-items: center;
 }
@@ -187,7 +233,6 @@ async function logout() {
     cursor: default;
 }
 
-/* AL HACER SCROLL */
 nav.fixed {
     position: fixed;
     top: 0;
@@ -222,5 +267,85 @@ nav.reducido .textoLogo {
 
 nav.reducido .textoLogo {
     min-width: 0;
+}
+
+.d-none {
+    display: none !important;
+}
+
+.d-md-flex {
+    display: flex !important;
+}
+
+.d-md-none {
+    display: none !important;
+}
+
+@media (max-width: 930px) {
+    .d-md-flex {
+        display: none !important;
+    }
+
+    .d-md-none {
+        display: block !important;
+    }
+
+    .logo {
+        height: 60px;
+        width: 60px;
+        transition: all 0.3s ease;
+    }
+
+    .textoLogo {
+        color: white;
+        font-size: xx-large;
+        transition: opacity 0.3s ease;
+    }
+
+    .cabecera {
+        justify-content: space-around;
+    }
+
+    .navegador {
+        flex-direction: row;
+    }
+}
+
+@media (max-width: 1300px) {
+    .navegador{
+        width: 40%;
+    }
+
+    .inicioSesion {
+        font-size: large;
+    }
+}
+
+@media (max-width: 768px) {
+    .cabecera{
+        min-height: 10vh;
+    }
+}
+
+@media (max-width: 650px) {
+    .cabecera {
+        flex-direction: column;
+    }
+
+    .navegador {
+        flex-direction: row;
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+.menu-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--terciary-color);
 }
 </style>
