@@ -72,7 +72,7 @@ watch(() => route.path, () => fetchProducciones(1));
     padding-bottom: 1rem;
 }
 
-@media (min-width: 1441px) {
+@media (min-width: 1661px) {
     .gridPeliculas {
         grid-template-columns: repeat(5, minmax(200px, 1fr));
     }
@@ -85,7 +85,7 @@ watch(() => route.path, () => fetchProducciones(1));
 
 @media (max-width: 1440px) {
     .gridPeliculas {
-        grid-template-columns: repeat(5, minmax(200px, 1fr));
+        grid-template-columns: repeat(5, minmax(190px, 1fr));
         gap: 0px;
     }
 
@@ -96,10 +96,15 @@ watch(() => route.path, () => fetchProducciones(1));
     }
 }
 
-@media (max-width: 1300px) {
+@media (max-width: 1440px) {
+    .gridPeliculas {
+        grid-template-columns: repeat(5, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 1380px) {
     .gridPeliculas {
         grid-template-columns: repeat(5, minmax(160px, 1fr));
-        gap: 0px;
     }
 }
 

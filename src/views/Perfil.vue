@@ -1,8 +1,8 @@
 <template>
     <div class="perfil-layout">
-        <div class="perfil-main">
-            <Loading :cargando="cargando"></Loading>
-            <div v-if="!cargando" class="perfil">
+        <Loading :cargando="cargando"></Loading>
+        <div v-if="!cargando" class="perfil-main">
+            <div class="perfil">
                 <h2 class="text-center">{{ user.name }}</h2>
                 <div class="perfil-top mb-4">
                     <div class="perfil-avatar-box">
@@ -523,9 +523,93 @@ async function fetchListasReproduccion() {
 }
 
 @media (max-width: 1024px) {
- .perfil-main {
-    margin-left: 7rem;
-    margin-right: 7rem;
- }
+    .perfil-main {
+        margin-left: 7rem;
+        margin-right: 7rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .perfil-layout {
+        padding-top: 5rem;
+        padding-bottom: 1rem;
+    }
+
+    .perfil-main {
+        margin-left: 4rem;
+        margin-right: 4rem;
+    }
+}
+
+@media (max-width: 650px) {
+    .perfil-layout {
+        padding-top: 7rem;
+        padding-bottom: 1rem;
+    }
+}
+
+@media (max-width: 526px) {
+    .perfil-layout {
+        padding-top: 6rem;
+        padding-bottom: 0;
+    }
+
+    .perfil-main {
+        padding-top: 1rem;
+        margin-left: 0rem;
+        margin-right: 0rem;
+        border-radius: 0;
+    }
+
+    .perfil-top {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .perfil-avatar-box {
+        flex: 0;
+    }
+
+    .favorita-card img {
+        width: 100px;
+    }
+
+    .tabs {
+        font-size: 15px;
+        gap: 0.2rem;
+    }
+
+    .peliculas-grid {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        height: 180px;
+    }
+
+    .pelicula-card img {
+        width: 100px;
+    }
+}
+
+@media (max-width: 426px) {
+    .tabs {
+        font-size: smaller;
+    }
+
+    .perfil-avatar {
+        width: 120px;
+        height: 120px;
+    }
+}
+
+@media (max-width: 410px) {
+    .peliculas-grid {
+        grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+        justify-items: center;
+    }
+}
+
+@media (max-width: 410px) {
+    .tabs button {
+        padding: 0.5rem 0.5rem;
+    }
 }
 </style>

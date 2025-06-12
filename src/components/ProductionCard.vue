@@ -46,13 +46,19 @@ function setDefaultImage() {
   font-weight: 500;
 }
 
-@media (max-width: 1450px) {
+@media (max-width: 1660px) {
   .produccion-card {
-    width: 160px !important;
+    width: 190px !important;
   }
 
   .titulo {
     margin-bottom: 1rem !important;
+  }
+}
+
+@media (max-width: 1450px) {
+  .produccion-card {
+    width: 160px !important;
   }
 }
 

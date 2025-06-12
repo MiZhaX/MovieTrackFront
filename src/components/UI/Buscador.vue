@@ -84,6 +84,7 @@ onBeforeUnmount(() => {
     border: 1px solid var(--terciary-color);
     background-color: var(--terciary-color);
     caret-color: var(--primary-color);
+    color: black;
 }
 
 .input:focus {

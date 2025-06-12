@@ -148,6 +148,12 @@ input {
     border-radius: 4px;
     background: var(--cuaternary-color);
     color: black;
+    outline: none;
+}
+input:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: var(--primary-color);
 }
 
 button[type="submit"] {
@@ -166,5 +172,24 @@ button[type="submit"] {
 button[type="submit"]:hover {
     background: var(--secondary-color);
     color: white;
+}
+
+@media (max-width: 1024px) {
+    .container {
+        font-size: smaller;
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding-top: 5rem;
+    }
+}
+
+@media (max-width: 650px) {
+    .container {
+        padding-top: 7rem;
+    }
 }
 </style>

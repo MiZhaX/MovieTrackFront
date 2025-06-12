@@ -316,6 +316,10 @@ nav.reducido .textoLogo {
         width: 40%;
     }
 
+    .boton {
+        font-size: 15px;
+    }
+
     .inicioSesion {
         font-size: large;
     }
