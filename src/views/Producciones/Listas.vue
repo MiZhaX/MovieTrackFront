@@ -4,10 +4,12 @@
     <div v-if="!cargando && producciones" class="contenedor">
         <div class="detalles">
             <div v-if="producciones.length > 0">
-                <h2 class="nombre-lista">
-                    {{ nombreLista }}
+                <h2 class="nombre-lista mb-2">
+                    <input v-if="modoEdicion" v-model="nombreListaEdit" :disabled="!modoEdicion"
+                        class="input-editar-nombre mr-3" maxlength="50" />
+                    <span v-else class="mr-3">{{ nombreLista }}</span>
                     <button v-if="lista.usuario_id && usuarioId.id && lista.usuario_id == usuarioId.id"
-                        class="btnEditar" @click="modoEdicion = !modoEdicion">
+                        class="btnEditar" @click="toggleEdicion">
                         <font-awesome-icon :icon="!modoEdicion ? 'pen' : 'pen-ruler'" />
                     </button>
                     <button v-if="lista.usuario_id && usuarioId.id && lista.usuario_id == usuarioId.id"
@@ -15,7 +17,11 @@
                         <font-awesome-icon :icon="['fas', 'trash-can']" />
                     </button>
                 </h2>
-                <p class="text-center">{{ descripcion }}</p>
+                <p class="text-center descripcion">
+                    <textarea v-if="modoEdicion" v-model="descripcionEdit" :disabled="!modoEdicion" placeholder="Agrega una descripción..."
+                        class="input-editar-desc" maxlength="255" rows="2" />
+                    <span v-else>{{ descripcion }}</span>
+                </p>
                 <div class="grid-lista">
                     <div v-for="p in producciones" :key="p.produccion_id" class="produccion-lista-wrapper">
                         <div class="eliminar-wrapper">
@@ -74,6 +80,53 @@ const usuarioId = ref([])
 const modalBorrarListaRef = ref(null)
 const toast = useToast();
 const dialogBorrarVisible = ref(false);
+const nombreListaEdit = ref('');
+const descripcionEdit = ref('');
+let nombreListaOriginal = '';
+let descripcionOriginal = '';
+
+function setEditValues() {
+    nombreListaEdit.value = nombreLista.value;
+    descripcionEdit.value = descripcion.value;
+    nombreListaOriginal = nombreLista.value;
+    descripcionOriginal = descripcion.value;
+}
+
+async function toggleEdicion() {
+    if (!modoEdicion.value) {
+        setEditValues();
+        modoEdicion.value = true;
+    } else {
+        const id = route.params.listaId;
+        const cambios = {};
+        if (nombreListaEdit.value !== nombreListaOriginal) {
+            cambios.nombre = nombreListaEdit.value;
+        }
+        if (descripcionEdit.value !== descripcionOriginal) {
+            cambios.descripcion = descripcionEdit.value;
+        }
+        if (Object.keys(cambios).length > 0) {
+            try {
+                const token = localStorage.getItem('token');
+                await axios.put(
+                    `https://movietrackapi.up.railway.app/api/v1/listasPersonalizadas/${id}`,
+                    cambios,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    }
+                );
+                nombreLista.value = nombreListaEdit.value;
+                descripcion.value = descripcionEdit.value;
+                toast.add({ severity: 'success', summary: 'Éxito', detail: 'Lista actualizada correctamente', life: 3000, group: 'br' });
+            } catch (error) {
+                toast.add({ severity: 'warn', summary: 'Atención', detail: 'No se pudo actualizar la lista.', life: 3000, group: 'br' });
+            }
+        }
+        modoEdicion.value = false;
+    }
+}
 
 async function fetchProduccionesLista() {
     cargando.value = true
@@ -95,6 +148,8 @@ async function fetchProduccionesLista() {
         if (producciones.value.length > 0 && producciones.value[0].lista_personalizada) {
             descripcion.value = producciones.value[0].lista_personalizada.descripcion
         }
+        // Inicializa los valores editables
+        setEditValues();
     } catch (error) {
         producciones.value = []
         nombreLista.value = 'Lista de reproducción'
@@ -237,6 +292,38 @@ onMounted(() => {
     background-color: var(--primary-color);
 }
 
+.input-editar-nombre {
+    background-color: var(--cuaternary-color);
+    border: none;
+    border-bottom: 3px solid var(--terciary-color);
+    text-align: center;
+    color: black;
+    font-weight: bold;
+}
+
+.input-editar-nombre:focus {
+    outline: none;
+}
+
+.input-editar-desc {
+    height: 35px;
+    width: 100%; 
+    background-color: var(--cuaternary-color);
+    border: none;
+    border-bottom: 3px solid var(--terciary-color);
+    text-align: center;
+    color: black;
+}
+
+.input-editar-desc:focus {
+    outline: none;
+}
+
+.descripcion {
+    margin-right: 2rem;
+    margin-left: 2rem;
+}
+
 @media (min-width: 1450px) {
     .grid-lista {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -271,9 +358,21 @@ onMounted(() => {
 
 @media (max-width: 480px) {
     .nombre-lista {
+        margin-left: 2rem;
+        margin-right: 2rem;
+    }
+
+    .input-editar-nombre {
+        max-width: 100%;
+        margin-right: 0 !important;
+        margin-bottom: 0.5rem;
+    }
+
+    .nombre-lista {
         margin-top: 0.5rem;
         margin-bottom: 1rem;
     }
+
     .grid-lista {
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     }
