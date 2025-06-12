@@ -8,7 +8,7 @@
           <p class="h5 mr-4 ml-4"><strong>MovieTrack</strong> te ayuda a llevar el control de lo que ves, lo que sueñas
             ver y
             quién te inspira en la pantalla.</p>
-          <router-link to="/login" class="btn-principal">Comienza ahora</router-link>
+          <button class="btn-principal" @click="irAComenzar">Comienza ahora</button>
         </div>
       </section>
       <div class="info-landing">
@@ -27,13 +27,18 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 import ProduccionCard from '@/components/ProductionCard.vue'
 
+const router = useRouter()
 const estrenos = ref([])
 const error = ref(null)
+const user = ref(null)
 
 onMounted(async () => {
+  const storedUser = localStorage.getItem('user')
+  user.value = storedUser ? JSON.parse(storedUser) : null
   try {
     const { data } = await axios.get('https://movietrackapi.up.railway.app/api/v1/estrenos')
     estrenos.value = data?.data || []
@@ -41,6 +46,14 @@ onMounted(async () => {
     error.value = 'No se pudieron cargar los estrenos.'
   }
 })
+
+function irAComenzar() {
+  if (user.value && user.value.id) {
+    router.push(`/perfil/${user.value.id}`)
+  } else {
+    router.push('/login')
+  }
+}
 </script>
 
 <style scoped>
@@ -93,6 +106,7 @@ onMounted(async () => {
   cursor: pointer;
   text-decoration: none;
   transition: background 0.2s;
+  border: none;
 }
 
 .btn-principal:hover {
