@@ -28,6 +28,7 @@
     /* width: 100%; */
     text-align: center;
     outline: none;
+    color: black;
 }
 
 .boton option {

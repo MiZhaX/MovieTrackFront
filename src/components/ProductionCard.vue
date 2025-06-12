@@ -1,7 +1,12 @@
 <template>
   <div class="produccion-card" :style="{ width: props.tamano + 'px' }">
-    <RouterLink :to="`/producciones/${produccion.id}`"><img :src="posterPath" :alt="produccion.titulo"
-        @error="setDefaultImage" ref="imgRef" /></RouterLink>
+    <div class="poster-wrapper">
+      <RouterLink :to="`/producciones/${produccion.id}`">
+        <img :src="posterPath" :alt="produccion.titulo"
+          @error="setDefaultImage" ref="imgRef" />
+        <span v-if="fecha" class="fecha-estreno">{{ formatearFecha(produccion.fecha_estreno) }}</span>
+      </RouterLink>
+    </div>
     <p class="titulo m-0">{{ produccion.titulo }} <span v-if="detalles">- {{ produccion.puntuacion_critica }}⭐</span>
     </p>
   </div>
@@ -16,6 +21,10 @@ const props = defineProps({
   detalles: {
     type: Boolean,
     default: true
+  },
+  fecha: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -28,6 +37,12 @@ function setDefaultImage() {
     imgRef.value.src = '/assets/img/default.png';
   }
 }
+
+function formatearFecha(fecha) {
+    if (!fecha) return '';
+    const [a, m, d] = fecha.split('-');
+    return `${d}/${m}/${a}`;
+}
 </script>
 
 <style scoped>
@@ -35,10 +50,28 @@ function setDefaultImage() {
   text-align: center;
 }
 
+.poster-wrapper {
+  position: relative;
+  width: 100%;
+}
+
 .produccion-card img {
   width: 100%;
   border-radius: 8px;
   object-fit: cover;
+}
+
+.fecha-estreno {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--terciary-color);
+  color: black;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: medium;
+  font-weight: 500;
+  z-index: 2;
 }
 
 .titulo {
@@ -83,6 +116,10 @@ function setDefaultImage() {
 
   .titulo {
     font-size: 13px;
+  }
+
+  .fecha-estreno {
+    font-size: smaller;
   }
 }
 

@@ -57,15 +57,15 @@ const scrolled = ref(false);
 const user = ref(null);
 
 const menu = ref(null);
-const menuOpen = ref(false); 
+const menuOpen = ref(false);
 const menuItems = ref([]);
 
 const toggleMenu = () => {
-    menuOpen.value = !menuOpen.value; 
+    menuOpen.value = !menuOpen.value;
     if (menuOpen.value) {
         menu.value.show(event);
     } else {
-        menu.value.hide(); 
+        menu.value.hide();
     }
 };
 
@@ -81,7 +81,7 @@ const updateMenuItems = () => {
         user.value
             ? { label: 'Cerrar sesión', command: logout }
             : null,
-    ].filter(item => item && item.label); 
+    ].filter(item => item && item.label);
 };
 
 updateMenuItems();
@@ -95,7 +95,7 @@ onMounted(() => {
     window.addEventListener('scroll', handleScroll);
     const userData = localStorage.getItem('user');
     user.value = userData ? JSON.parse(userData) : null;
-    updateMenuItems(); 
+    updateMenuItems();
 });
 
 onUnmounted(() => {
@@ -107,7 +107,7 @@ watch(
     () => {
         const userData = localStorage.getItem('user');
         user.value = userData ? JSON.parse(userData) : null;
-        updateMenuItems(); 
+        updateMenuItems();
     }
 );
 
@@ -136,7 +136,7 @@ async function logout() {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
         user.value = null;
-        updateMenuItems(); 
+        updateMenuItems();
         router.push('/');
     }
 }
@@ -151,6 +151,9 @@ async function logout() {
     min-height: 12vh;
     transition: all 0.3s ease;
     align-items: center;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    box-shadow: 0 4px 16px -4px rgba(255, 217, 102, 0.527);
 }
 
 .linkLogo {
@@ -173,6 +176,7 @@ async function logout() {
 .textoLogo {
     color: white;
     transition: opacity 0.3s ease;
+    margin-bottom: 0;
 }
 
 .navegador {
@@ -312,7 +316,7 @@ nav.reducido .textoLogo {
 }
 
 @media (max-width: 1300px) {
-    .navegador{
+    .navegador {
         width: 40%;
     }
 
@@ -325,8 +329,14 @@ nav.reducido .textoLogo {
     }
 }
 
+@media (max-width: 1300px) {
+    .textoLogo {
+        font-size: x-large;
+    }
+}
+
 @media (max-width: 768px) {
-    .cabecera{
+    .cabecera {
         min-height: 10vh;
     }
 }

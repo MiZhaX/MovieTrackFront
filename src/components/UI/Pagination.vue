@@ -48,6 +48,7 @@ function irAPagina(pagina) {
     background: var(--terciary-color);
     cursor: pointer;
     border-radius: 4px;
+    color: black;
 }
 .paginacion button.activa {
     background: var(--primary-color);
