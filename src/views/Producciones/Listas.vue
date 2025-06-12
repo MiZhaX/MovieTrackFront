@@ -101,6 +101,8 @@ async function toggleEdicion() {
         const cambios = {};
         if (nombreListaEdit.value !== nombreListaOriginal) {
             cambios.nombre = nombreListaEdit.value;
+        } else if (descripcionEdit.value !== descripcionOriginal) {
+            cambios.nombre = nombreListaEdit.value;
         }
         if (descripcionEdit.value !== descripcionOriginal) {
             cambios.descripcion = descripcionEdit.value;
