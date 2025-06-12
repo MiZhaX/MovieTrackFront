@@ -299,7 +299,6 @@ async function fetchListasReproduccion() {
 }
 .perfil-layout {
     padding: 2rem 0;
-    padding-top: 7rem;
 }
 
 .perfil-main {
@@ -534,7 +533,7 @@ async function fetchListasReproduccion() {
 
 @media (max-width: 768px) {
     .perfil-layout {
-        padding-top: 5rem;
+        padding-top: 0.5rem;
         padding-bottom: 1rem;
     }
 
@@ -552,15 +551,19 @@ async function fetchListasReproduccion() {
 }
 
 @media (max-width: 526px) {
+    .relleno {
+        min-height: 10vh;
+    }
+
     .perfil-layout {
-        padding-top: 1rem;
+        padding-top: 0;
         padding-bottom: 0;
     }
 
     .perfil-main {
-        padding-top: 1rem;
-        margin-left: 0rem;
-        margin-right: 0rem;
+        padding-top: 3rem;
+        margin-left: 0;
+        margin-right: 0;
         border-radius: 0;
     }
 

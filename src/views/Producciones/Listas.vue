@@ -326,7 +326,7 @@ onMounted(() => {
 
 @media (min-width: 1450px) {
     .grid-lista {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(5, minmax(200px, 1fr));
     }
 }
 
@@ -357,6 +357,10 @@ onMounted(() => {
 }
 
 @media (max-width: 480px) {
+    .relleno {
+        display: none;
+    }
+
     .nombre-lista {
         margin-left: 2rem;
         margin-right: 2rem;
@@ -379,10 +383,12 @@ onMounted(() => {
 
     .contenedor {
         border-radius: 0;
-        margin-top: 1rem;
+        margin-top: 10vh;
         margin-bottom: 0;
         margin-left: 0rem;
         margin-right: 0rem;
+        min-height: 81.1vh;
+        padding-top: 2rem;
     }
 
     .grid-lista {

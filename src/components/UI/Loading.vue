@@ -14,4 +14,10 @@ const props = defineProps({
     justify-content: center;
     align-items: center;
 }
+
+@media (max-width: 526px) {
+    .cargando {
+        margin-top: 7rem;
+    }
+}
 </style>
