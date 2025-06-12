@@ -23,14 +23,14 @@
 }
 
 .btn-primary {
-  background-color: var(--terciary-color);
-  border-color: var(--terciary-color);
+  background-color: var(--terciary-color) !important;
+  border-color: var(--terciary-color) !important;
   color: black;
 }
 
 .btn-primary:hover {
-  background-color: var(--var-terciary-color);
-  border-color: var(--var-terciary-color);
+  background-color: var(--var-terciary-color) !important;
+  border-color: var(--var-terciary-color) !important;
 }
 
 @media (max-width: 415px) {

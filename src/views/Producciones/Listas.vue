@@ -143,8 +143,9 @@ async function fetchProduccionesLista() {
                 }
             }
         )
-
+            
         lista.value = response.data.data
+        descripcion.value = lista.value.descripcion
         producciones.value = response.data.data.produccionesListas || []
         nombreLista.value = route.params.listaNombre
         if (producciones.value.length > 0 && producciones.value[0].lista_personalizada) {
@@ -195,7 +196,7 @@ async function borrarListaConfirmada() {
                 }
             }
         )
-        dialogBorrarVisible.value = false; // Cierra el Dialog
+        dialogBorrarVisible.value = false;
         toast.add({ severity: 'success', summary: 'Éxito', detail: 'Lista eliminada correctamente', life: 3000, group: 'br' });
         router.push(`/perfil/${usuarioId.value.id}`)
     } catch (error) {

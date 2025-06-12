@@ -1,13 +1,33 @@
 <template>
     <div class="buscador-header" ref="buscadorRef">
         <input v-model="termino" type="text" placeholder="Busca tu película o serie favorita..." class="input" />
-        <div v-if="mostrarDropdown && resultados.length" class="resultados">
-            <RouterLink v-for="produccion in resultados" :key="produccion.id" :to="`/producciones/${produccion.id}`"
-                class="resultado" @click="reset">
-                <img :src="getPoster(produccion.id)" :alt="produccion.titulo" @error="ponerImagenPorDefecto" />
-                <span>{{ produccion.titulo }}</span>
-            </RouterLink>
+        <div v-if="mostrarDropdown" class="resultados"
+            :class="{ 'd-flex': !resultados.length, 'align-items-center': !resultados.length }">
+            <template v-if="resultados.length">
+                <RouterLink v-for="produccion in resultados" :key="produccion.id" :to="`/producciones/${produccion.id}`"
+                    class="resultado" @click="reset">
+                    <img :src="getPoster(produccion.id)" :alt="produccion.titulo" @error="ponerImagenPorDefecto" />
+                    <span>{{ produccion.titulo }}</span>
+                </RouterLink>
+            </template>
+            <template v-else>
+                <button class="btn-recomendar" @click="abrirDialogRecomendar">
+                    ¿No encuentras lo que buscas? Recomienda una película
+                </button>
+            </template>
         </div>
+        <Dialog v-model:visible="dialogRecomendarVisible" modal header="Recomendar película">
+            <form @submit.prevent="enviarRecomendacion">
+                <label for="nombrePelicula" class="form-label">Nombre de la película:</label>
+                <input id="nombrePelicula" v-model="nombrePelicula" class="input" required maxlength="100" />
+                <div class="modal-footer mt-3 d-flex gap-2 justify-content-end">
+                    <button type="button" class="btn btn-secondary"
+                        @click="dialogRecomendarVisible = false">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" :disabled="!nombrePelicula.trim()">Enviar</button>
+                </div>
+            </form>
+        </Dialog>
+        <Toast group="br" position="bottom-right" />
     </div>
 </template>
 
@@ -15,11 +35,18 @@
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import axios from 'axios';
 import { debounce } from 'lodash';
+import Dialog from 'primevue/dialog';
+import { useToast } from 'primevue/usetoast';
 
 const termino = ref('');
 const resultados = ref([]);
 const mostrarDropdown = ref(false);
 const buscadorRef = ref(null);
+const toast = useToast();
+
+const dialogRecomendarVisible = ref(false);
+const nombrePelicula = ref('');
+const mensajeRecomendacion = ref('');
 
 const buscar = debounce(async () => {
     if (termino.value.trim().length < 2) {
@@ -39,7 +66,7 @@ const buscar = debounce(async () => {
         mostrarDropdown.value = true;
     } catch (e) {
         resultados.value = [];
-        mostrarDropdown.value = false;
+        mostrarDropdown.value = true;
     }
 }, 300);
 
@@ -60,6 +87,32 @@ const reset = () => {
     resultados.value = [];
     mostrarDropdown.value = false;
 };
+
+function abrirDialogRecomendar() {
+    dialogRecomendarVisible.value = true;
+    nombrePelicula.value = '';
+    mensajeRecomendacion.value = '';
+}
+
+async function enviarRecomendacion() {
+    try {
+        // await axios.post('https://formsubmit.co/ajax/tu-correo@ejemplo.com', {
+        //     nombre_pelicula: nombrePelicula.value,
+        //     mensaje: `El usuario recomienda la película: ${nombrePelicula.value}`
+        // }, {
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     }
+        // });
+        toast.add({ severity: 'success', summary: 'Recomendación Realizada', detail: '¡Gracias por tu recomendación!', life: 3000, group: 'br' });
+        nombrePelicula.value = '';
+        dialogRecomendarVisible.value = false;
+    } catch (e) {
+        mensajeRecomendacion.value = '';
+        toast.add({ severity: 'warn', summary: 'Error', detail: 'No se pudo enviar la recomendación. Inténtalo más tarde.', life: 3000, group: 'br' });
+
+    }
+}
 
 watch(termino, buscar);
 
@@ -122,6 +175,28 @@ onBeforeUnmount(() => {
     width: 40px;
     height: auto;
     border-radius: 4px;
+}
+
+.btn-recomendar {
+    padding: 0.7rem 1rem;
+    background: var(--secondary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    transition: background 0.2s;
+}
+
+.btn-recomendar:hover {
+    background: var(--primary-color);
+}
+
+.mensaje-recomendacion {
+    margin-top: 1rem;
+    color: var(--primary-color);
+    text-align: center;
 }
 
 @media (max-width: 930px) {
