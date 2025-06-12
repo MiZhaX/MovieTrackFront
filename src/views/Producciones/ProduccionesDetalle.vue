@@ -68,9 +68,9 @@
                         </div>
                         <div class="acciones mt-4 d-flex justify-content-between">
                             <div class="botones d-flex">
-                                <button class="btn me-2 btn-primary" @click="puntuarProduccion">Puntuar</button>
-                                <button class="btn me-2 btn-primary" @click="abrirModalLista">Añadir a
-                                    lista</button>
+                                <button class="btn me-2 btn-primary"
+                                    @click="abrirDialogResena">Reseña</button>
+                                <button class="btn me-2 btn-primary" @click="abrirModalLista">Añadir a lista</button>
                             </div>
                             <div class="marcas">
                                 <button :class="['btn', 'me-2', visualizada ? 'btn-secondary' : 'btn-primary']"
@@ -118,6 +118,29 @@
             </div>
         </form>
     </Dialog>
+    <Dialog v-model:visible="dialogPuntuarVisible" modal header="Reseña">
+        <form @submit.prevent="enviarResena">
+            <div class="mb-3 d-flex flex-column align-items-center">
+                <label class="mb-2">Puntuación:</label>
+                <div class="estrellas">
+                    <span v-for="n in 5" :key="n" class="estrella"
+                        :class="{ activa: (hoverPuntuacion ? hoverPuntuacion >= n : puntuacion >= n) }"
+                        @click="puntuacion = n" @mouseover="hoverPuntuacion = n" @mouseleave="hoverPuntuacion = 0">
+                        <font-awesome-icon :icon="'star'" />
+                    </span>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="descripcionResena" class="form-label">Descripción (opcional):</label>
+                <textarea id="descripcionResena" v-model="descripcionResena" class="form-control" rows="3"
+                    maxlength="500"></textarea>
+            </div>
+            <div class="modal-footer mt-3 d-flex gap-2 justify-content-end">
+                <button type="button" class="btn btn-secondary" @click="dialogPuntuarVisible = false">Cancelar</button>
+                <button type="submit" class="btn btn-primary" :disabled="puntuacion === 0">Enviar</button>
+            </div>
+        </form>
+    </Dialog>
 </template>
 
 <script setup>
@@ -127,15 +150,8 @@ import axios from 'axios';
 import Loading from '@/components/UI/Loading.vue';
 import ActorCard from '@/components/ActorCard.vue';
 import DirectorCard from '@/components/DirectorCard.vue';
-import { Modal } from 'bootstrap';
 import { useToast } from 'primevue/usetoast';
 import Dialog from 'primevue/dialog';
-import ScrollPanel from 'primevue/scrollpanel';
-import Tabs from 'primevue/tabs';
-import TabList from 'primevue/tablist';
-import Tab from 'primevue/tab';
-import TabPanels from 'primevue/tabpanels';
-import TabPanel from 'primevue/tabpanel';
 
 const route = useRoute();
 const produccion = ref(null);
@@ -154,10 +170,122 @@ const modalListasRef = ref(null);
 const listaSeleccionada = ref('');
 const toast = useToast();
 
+const dialogPuntuarVisible = ref(false)
+const puntuacion = ref(0)
+const hoverPuntuacion = ref(0)
+const descripcionResena = ref('')
+const puntuacionOriginal = ref(null)
+const descripcionOriginal = ref('')
+
 
 function abrirModalLista() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/login';
+        return;
+    }
     listaSeleccionada.value = '';
     dialogVisible.value = true;
+}
+
+function abrirDialogResena() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/login';
+        return;
+    }
+    dialogPuntuarVisible.value = true;
+}
+
+async function enviarResena() {
+    if (!produccion.value || puntuacion.value === 0) return;
+
+    if (
+        puntuacionOriginal.value !== null &&
+        puntuacion.value === puntuacionOriginal.value &&
+        (descripcionResena.value || '') === (descripcionOriginal.value || '')
+    ) {
+        dialogPuntuarVisible.value = false;
+        return;
+    }
+
+    try {
+        const token = localStorage.getItem('token');
+        const body = {
+            usuario_id: user.value.id,
+            produccion_id: produccion.value.id,
+            puntuacion: puntuacion.value
+        };
+        if (descripcionResena.value && descripcionResena.value.trim() !== "") {
+            body.descripcion = descripcionResena.value;
+        }
+
+        if (puntuacionOriginal.value !== null) {
+            const { data } = await axios.get(
+                `https://movietrackapi.up.railway.app/api/v1/resenas?usuario_id[eq]=${user.value.id}&produccion_id[eq]=${produccion.value.id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+            if (data.data && data.data.length > 0) {
+                const resenaId = data.data[0].id;
+                await axios.put(
+                    `https://movietrackapi.up.railway.app/api/v1/resenas/${resenaId}`,
+                    body,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    }
+                );
+            }
+        } else {
+            await axios.post(
+                'https://movietrackapi.up.railway.app/api/v1/resenas',
+                body,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+        }
+
+        toast.add({ severity: 'success', summary: '¡Gracias!', detail: 'Reseña guardada correctamente.', life: 3000, group: 'br' });
+        dialogPuntuarVisible.value = false;
+        puntuacionOriginal.value = puntuacion.value;
+        descripcionOriginal.value = descripcionResena.value;
+    } catch (error) {
+        console.log(error)
+        toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo guardar la reseña.', life: 3000, group: 'br' });
+    }
+}
+
+async function comprobarResena() {
+    if (!user.value || !produccion.value) return;
+    try {
+        const token = localStorage.getItem('token');
+        const { data } = await axios.get(
+            `https://movietrackapi.up.railway.app/api/v1/resenas?usuario_id[eq]=${user.value.id}&produccion_id[eq]=${produccion.value.id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+        if (data.data && data.data.length > 0) {
+            const resena = data.data[0];
+            puntuacion.value = resena.puntuacion;
+            descripcionResena.value = resena.descripcion || '';
+            puntuacionOriginal.value = resena.puntuacion;
+            descripcionOriginal.value = resena.descripcion || '';
+        } else {
+            puntuacionOriginal.value = null;
+            descripcionOriginal.value = '';
+        }
+    } catch (error) { }
 }
 
 async function añadirALista() {
@@ -223,6 +351,7 @@ onMounted(async () => {
     await fetchProduccion();
     await comprobarMarca();
     await fetchListasPersonalizadas();
+    await comprobarResena();
 });
 
 watch(
@@ -231,6 +360,7 @@ watch(
         await fetchProduccion();
         await comprobarMarca();
         await fetchListasPersonalizadas();
+        await comprobarResena();
     }
 );
 
@@ -492,6 +622,38 @@ function puntuarProduccion() {
 
 .form-select:focus {
     border-color: none;
+    box-shadow: none;
+}
+
+.estrellas {
+    display: flex;
+    gap: 0.3rem;
+    font-size: 2rem;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+}
+
+.estrella {
+    cursor: pointer;
+    color: #ccc;
+    transition: color 0.2s;
+    user-select: none;
+}
+
+.estrella:hover {
+    color: #FFD700;
+}
+
+.estrella.activa {
+    color: #FFD700;
+}
+
+textarea.form-control {
+    resize: vertical;
+}
+
+textarea.form-control:focus {
+    outline: none;
     box-shadow: none;
 }
 

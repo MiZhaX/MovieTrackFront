@@ -5,7 +5,8 @@
       <section class="hero">
         <div class="hero-content">
           <h2 class="h1 mr-4 ml-4">Descubre, organiza y comparte tus películas y series favoritas</h2>
-          <p class="h5 mr-4 ml-4"><strong>MovieTrack</strong> te ayuda a llevar el control de lo que ves, lo que sueñas ver y
+          <p class="h5 mr-4 ml-4"><strong>MovieTrack</strong> te ayuda a llevar el control de lo que ves, lo que sueñas
+            ver y
             quién te inspira en la pantalla.</p>
           <router-link to="/login" class="btn-principal">Comienza ahora</router-link>
         </div>
@@ -121,22 +122,32 @@ onMounted(async () => {
     margin-right: 3rem;
     margin-left: 3rem;
   }
+
+  .gridPeliculas {
+    grid-template-columns: repeat(6, minmax(160px, 1fr));
+  }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1320px) {
   .info-landing {
     margin-right: 1rem;
     margin-left: 1rem;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1280px) {
+  .gridPeliculas {
+    gap: 5px;
+  }
+}
+
+@media (max-width: 1100px) {
   .gridPeliculas {
     grid-template-columns: repeat(3, minmax(160px, 1fr));
   }
 }
 
-@media (max-width: 425px) {
+@media (max-width: 480px) {
   .info-landing {
     margin-right: 0.5rem;
     margin-left: 0.5rem;
