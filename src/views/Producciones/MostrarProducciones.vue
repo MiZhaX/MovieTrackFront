@@ -1,22 +1,33 @@
 <template>
     <div class="relleno"></div>
-    <Loading :cargando="cargando"></Loading>
+    <Loading :cargando="cargando" />
     <div v-if="!cargando" class="contenedor">
         <div>
-            <Filters></Filters>
+            <Filters
+                :generoSeleccionado="generoSeleccionado"
+                :valoracionSeleccionada="valoracionSeleccionada"
+                @filtrar-genero="filtrarPorGenero"
+                @filtrar-valoracion="filtrarPorValoracion"
+            />
+
             <div class="producciones">
-                <div class="gridPeliculas">
+                <div v-if="producciones.length" class="gridPeliculas">
                     <ProduccionCard v-for="p in producciones" :key="p.id" :produccion="p" :tamano="200"
-                        :detalles="false" />
+                        :detalles="false" :nota="false" />
+                </div>
+                <div v-else class="text-center">
+                    <p class="h1">No se han encontrado producciones</p>
                 </div>
             </div>
-            <Pagination :currentPage="currentPage" :lastPage="lastPage" @cambiar-pagina="fetchProducciones" />
+
+            <Pagination v-if="lastPage > 1" :currentPage="currentPage" :lastPage="lastPage" @cambiar-pagina="fetchProducciones" />
         </div>
+
         <Toast group="br" position="bottom-right" />
     </div>
 </template>
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
 import axios from 'axios';
@@ -24,36 +35,66 @@ import ProduccionCard from '@/components/ProductionCard.vue';
 import Pagination from '@/components/UI/Pagination.vue';
 import Filters from '@/components/UI/Filters.vue';
 import Loading from '@/components/UI/Loading.vue';
-import '@/assets/css/variables.css';
 
 const route = useRoute();
+const toast = useToast();
+
 const producciones = ref([]);
 const cargando = ref(true);
 const currentPage = ref(1);
 const lastPage = ref(1);
-const toast = useToast();
+const generoSeleccionado = ref('');
+const valoracionSeleccionada = ref(''); // Nuevo estado para la valoración
 
 const fetchProducciones = async (page = 1) => {
     cargando.value = true;
-    let tipo = route.path.includes('peliculas') ? 'pelicula' : 'serie';
+    const tipo = route.path.includes('peliculas') ? 'pelicula' : 'serie';
+
+    let url = `https://movietrackapi.up.railway.app/api/v1/producciones?tipo[eq]=${tipo}&page=${page}`;
+    if (generoSeleccionado.value) {
+        url += `&genero_id[eq]=${generoSeleccionado.value}`;
+    }
+    // Agregar filtro de valoración si está seleccionado
+    if (valoracionSeleccionada.value !== '' && valoracionSeleccionada.value !== null) {
+        url += `&puntuacion_critica[gt]=${valoracionSeleccionada.value}`;
+    }
 
     try {
-        const response = await axios.get(
-            `https://movietrackapi.up.railway.app/api/v1/producciones?tipo[eq]=${tipo}&page=${page}`
-        );
+        const response = await axios.get(url);
         producciones.value = response.data.data;
         currentPage.value = response.data.meta.current_page;
         lastPage.value = response.data.meta.last_page;
     } catch (error) {
-        toast.add({ severity: 'warn', summary: 'Error', detail: 'Error al obtener los datos de las producciones.', life: 3000, group: 'br' });
+        toast.add({
+            severity: 'warn',
+            summary: 'Error',
+            detail: 'Error al obtener las producciones.',
+            life: 3000,
+            group: 'br'
+        });
     } finally {
         cargando.value = false;
     }
 };
 
-onMounted(() => fetchProducciones());
+watch(() => route.path, () => {
+    generoSeleccionado.value = null;
+    valoracionSeleccionada.value = ''; // Resetear valoración al cambiar de ruta
+    fetchProducciones(1);
+});
 
-watch(() => route.path, () => fetchProducciones(1));
+const filtrarPorGenero = (id) => {
+    generoSeleccionado.value = id || '';
+    fetchProducciones(1);
+};
+
+// Nuevo método para manejar el filtro de valoración
+const filtrarPorValoracion = (valor) => {
+    valoracionSeleccionada.value = valor || '';
+    fetchProducciones(1);
+};
+
+onMounted(() => fetchProducciones());
 </script>
 <style scoped>
 .gridPeliculas {

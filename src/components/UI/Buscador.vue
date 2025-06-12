@@ -2,7 +2,7 @@
     <div class="buscador-header" ref="buscadorRef">
         <input v-model="termino" type="text" placeholder="Busca tu película o serie favorita..." class="input" />
         <div v-if="mostrarDropdown" class="resultados"
-            :class="{ 'd-flex': !resultados.length, 'align-items-center': !resultados.length }">
+            :class="{ 'd-flex': !resultados.length, 'justify-content-center': !resultados.length }">
             <template v-if="resultados.length">
                 <RouterLink v-for="produccion in resultados" :key="produccion.id" :to="`/producciones/${produccion.id}`"
                     class="resultado" @click="reset">
@@ -96,14 +96,9 @@ function abrirDialogRecomendar() {
 
 async function enviarRecomendacion() {
     try {
-        // await axios.post('https://formsubmit.co/ajax/tu-correo@ejemplo.com', {
-        //     nombre_pelicula: nombrePelicula.value,
-        //     mensaje: `El usuario recomienda la película: ${nombrePelicula.value}`
-        // }, {
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     }
-        // });
+        await axios.post('https://movietrackapi.up.railway.app/api/v1/recomendarPelicula', {
+            nombre_pelicula: nombrePelicula.value,
+        });
         toast.add({ severity: 'success', summary: 'Recomendación Realizada', detail: '¡Gracias por tu recomendación!', life: 3000, group: 'br' });
         nombrePelicula.value = '';
         dialogRecomendarVisible.value = false;
@@ -199,17 +194,32 @@ onBeforeUnmount(() => {
     text-align: center;
 }
 
+@media (max-width: 1160px) {
+    .btn-recomendar {
+        font-size: 0.8rem;
+    }
+}
+
 @media (max-width: 930px) {
     .input {
         font-size: smaller;
         width: 350px;
+    }
+
+    .btn-recomendar {
+        padding: 0.5rem;
     }
 }
 
 @media (max-width: 768px) {
     .input {
         font-size: smaller;
-        width: 300px;
+        width: 320px;
+    }
+
+    .btn-recomendar {
+        margin-right: 0.5rem;
+        margin-left: 0.5rem;
     }
 }
 

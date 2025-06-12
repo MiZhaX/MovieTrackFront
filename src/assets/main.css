@@ -4,6 +4,11 @@
   background-color: var(--secondary-color) !important;
 }
 
+.p-popover-content {
+  background-color: var(--secondary-color) !important;
+  border-radius: 5px !important;
+}
+
 .p-button-text.p-button-secondary {
   color: black !important;
 }
