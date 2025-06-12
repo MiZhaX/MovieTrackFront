@@ -1,56 +1,55 @@
 <template>
-    <main>
-        <div class="contenedor">
-            <Loading :cargando="cargando"></Loading>
-            <div v-if="!cargando && producciones" class="detalles">
-                <div v-if="producciones.length > 0">
-                    <h2 class="nombre-lista">
-                        {{ nombreLista }}
-                        <button v-if="lista.usuario_id && usuarioId.id && lista.usuario_id == usuarioId.id"
-                            class="btnEditar" @click="modoEdicion = !modoEdicion">
-                            <font-awesome-icon :icon="!modoEdicion ? 'pen' : 'pen-ruler'" />
-                        </button>
-                        <button v-if="lista.usuario_id && usuarioId.id && lista.usuario_id == usuarioId.id"
-                            class="btnEditar" @click="abrirModalBorrarLista">
-                            <font-awesome-icon :icon="['fas', 'trash-can']" />
-                        </button>
-                    </h2>
-                    <p class="text-center">{{ descripcion }}</p>
-                    <div class="grid-lista">
-                        <div v-for="p in producciones" :key="p.produccion_id" class="produccion-lista-wrapper">
-                            <div class="eliminar-wrapper">
-                                <button v-if="modoEdicion" class="btn-eliminar-x" @click="eliminarProduccionLista(p.id)"
-                                    title="Eliminar de la lista">
-                                    <font-awesome-icon :icon="'xmark'" />
-                                </button>
-                                <ProductionCard
-                                    :produccion="{ id: p.produccion_id, titulo: p.titulo, puntuacion_critica: p.puntuacion_critica }"
-                                    :tamano="150" :detalles="false" />
-                            </div>
+    <div class="relleno"></div>
+    <Loading :cargando="cargando"></Loading>
+    <div v-if="!cargando && producciones" class="contenedor">
+        <div class="detalles">
+            <div v-if="producciones.length > 0">
+                <h2 class="nombre-lista">
+                    {{ nombreLista }}
+                    <button v-if="lista.usuario_id && usuarioId.id && lista.usuario_id == usuarioId.id"
+                        class="btnEditar" @click="modoEdicion = !modoEdicion">
+                        <font-awesome-icon :icon="!modoEdicion ? 'pen' : 'pen-ruler'" />
+                    </button>
+                    <button v-if="lista.usuario_id && usuarioId.id && lista.usuario_id == usuarioId.id"
+                        class="btnEditar" @click="abrirModalBorrarLista">
+                        <font-awesome-icon :icon="['fas', 'trash-can']" />
+                    </button>
+                </h2>
+                <p class="text-center">{{ descripcion }}</p>
+                <div class="grid-lista">
+                    <div v-for="p in producciones" :key="p.produccion_id" class="produccion-lista-wrapper">
+                        <div class="eliminar-wrapper">
+                            <button v-if="modoEdicion" class="btn-eliminar-x" @click="eliminarProduccionLista(p.id)"
+                                title="Eliminar de la lista">
+                                <font-awesome-icon :icon="'xmark'" />
+                            </button>
+                            <ProductionCard
+                                :produccion="{ id: p.produccion_id, titulo: p.titulo, puntuacion_critica: p.puntuacion_critica }"
+                                :tamano="150" :detalles="false" />
                         </div>
                     </div>
                 </div>
-                <div v-else>
-                    <h2 class="nombre-lista">{{ nombreLista }} <button
-                            v-if="lista.usuario_id && usuarioId.id && lista.usuario_id == usuarioId.id"
-                            class="btnEditar" @click="abrirModalBorrarLista">
-                            <font-awesome-icon :icon="['fas', 'trash-can']" />
-                        </button></h2>
-                    <p class="text-center">No hay producciones en esta lista.</p>
-                </div>
+            </div>
+            <div v-else>
+                <h2 class="nombre-lista">{{ nombreLista }} <button
+                        v-if="lista.usuario_id && usuarioId.id && lista.usuario_id == usuarioId.id" class="btnEditar"
+                        @click="abrirModalBorrarLista">
+                        <font-awesome-icon :icon="['fas', 'trash-can']" />
+                    </button></h2>
+                <p class="text-center">No hay producciones en esta lista.</p>
             </div>
         </div>
-        <Dialog v-model:visible="dialogBorrarVisible" modal header="Eliminar lista" :style="{ width: '400px' }">
-            <div>
-                <p>¿Estás seguro de que deseas eliminar esta lista? Esta acción no se puede deshacer.</p>
-            </div>
-            <template #footer>
-                <button type="button" class="btn btn-secondary" @click="dialogBorrarVisible = false">No</button>
-                <button type="button" class="btn btn-primary" @click="borrarListaConfirmada">Sí, eliminar</button>
-            </template>
-        </Dialog>
-        <Toast group="br" position="bottom-right" />
-    </main>
+    </div>
+    <Dialog v-model:visible="dialogBorrarVisible" modal header="Eliminar lista" :style="{ width: '400px' }">
+        <div>
+            <p>¿Estás seguro de que deseas eliminar esta lista? Esta acción no se puede deshacer.</p>
+        </div>
+        <template #footer>
+            <button type="button" class="btn btn-secondary" @click="dialogBorrarVisible = false">No</button>
+            <button type="button" class="btn btn-primary" @click="borrarListaConfirmada">Sí, eliminar</button>
+        </template>
+    </Dialog>
+    <Toast group="br" position="bottom-right" />
 </template>
 
 <script setup>
@@ -153,15 +152,21 @@ onMounted(() => {
 })
 </script>
 <style scoped>
+.relleno {
+    min-height: 12vh;
+}
+
 .contenedor {
+    margin: 0 auto;
     margin-left: 10rem;
     margin-right: 10rem;
     background-color: var(--cuaternary-color);
-    min-height: 89.1vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 7rem;
+    padding-bottom: 1rem;
+    border-radius: 10px;
+    padding-bottom: 1rem;
+    padding-top: 1rem;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
 }
 
 .nombre-lista {
@@ -172,9 +177,11 @@ onMounted(() => {
 }
 
 .grid-lista {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
     justify-content: center;
 }
 
@@ -228,5 +235,59 @@ onMounted(() => {
 
 .modal-content {
     background-color: var(--primary-color);
+}
+
+@media (min-width: 1450px) {
+    .grid-lista {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 1270px) {
+    .contenedor {
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        margin-left: 7rem;
+        margin-right: 7rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .grid-lista {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+
+    .contenedor {
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
+        margin-left: 4.5rem;
+        margin-right: 4.5rem;
+    }
+
+    .grid-lista {
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .nombre-lista {
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .grid-lista {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+
+    .contenedor {
+        border-radius: 0;
+        margin-top: 1rem;
+        margin-bottom: 0;
+        margin-left: 0rem;
+        margin-right: 0rem;
+    }
+
+    .grid-lista {
+        gap: 1rem;
+    }
 }
 </style>

@@ -1,5 +1,6 @@
 <template>
     <div class="perfil-layout">
+        <div class="relleno"></div>
         <Loading :cargando="cargando"></Loading>
         <div v-if="!cargando" class="perfil-main">
             <div class="perfil">
@@ -293,8 +294,10 @@ async function fetchListasReproduccion() {
 </script>
 
 <style scoped>
+.relleno {
+    min-height: 12vh;
+}
 .perfil-layout {
-    min-height: 100vh;
     padding: 2rem 0;
     padding-top: 7rem;
 }
@@ -550,7 +553,7 @@ async function fetchListasReproduccion() {
 
 @media (max-width: 526px) {
     .perfil-layout {
-        padding-top: 6rem;
+        padding-top: 1rem;
         padding-bottom: 0;
     }
 
