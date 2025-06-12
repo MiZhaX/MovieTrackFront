@@ -3,11 +3,11 @@
   background-color: var(--secondary-color) !important;
 }
 
-.p-button-text.p-button-secondary{
+.p-button-text.p-button-secondary {
   color: black !important;
 }
 
-.p-button-text.p-button-secondary:hover{
+.p-button-text.p-button-secondary:hover {
   color: var(--terciary-color) !important;
 }
 
@@ -22,12 +22,31 @@
 }
 
 .btn-primary {
-    background-color: var(--terciary-color);
-    border-color: var(--terciary-color);
-    color: black;
+  background-color: var(--terciary-color);
+  border-color: var(--terciary-color);
+  color: black;
 }
 
 .btn-primary:hover {
-    background-color: var(--var-terciary-color);
-    border-color: var(--var-terciary-color);
+  background-color: var(--var-terciary-color);
+  border-color: var(--var-terciary-color);
+}
+
+@media (max-width: 415px) {
+  .p-toast {
+    right: 10px !important;
+    width: 350px !important;
+  }
+
+  .p-dialog {
+    width: 300px !important;
+  }
+
+  .p-dialog-header {
+    padding: 1rem !important;
+  }
+
+  .p-dialog-content {
+    padding: 1rem !important;
+  }
 }

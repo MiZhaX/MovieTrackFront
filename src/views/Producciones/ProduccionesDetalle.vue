@@ -327,7 +327,6 @@ async function comprobarMarca() {
             await comprobarMarca();
         }
     } catch (error) {
-        console.error('Error comprobando marca:', error);
     } finally {
         cargando.value = false;
     }
@@ -353,11 +352,10 @@ async function marcarProduccion({ marcaParam = undefined, favorita = undefined }
                 }
             }
         );
-        // Actualiza el estado local tras marcar
+
         await comprobarMarca();
     } catch (error) {
         toast.add({ severity: 'warn', summary: 'Error', detail: 'Error al marcar producción', life: 3000, group: 'br' });
-        console.error(error);
     }
 }
 
@@ -529,7 +527,7 @@ function puntuarProduccion() {
     }
 }
 
-@media (max-width: 425px) {
+@media (max-width: 427px) {
     .contenedor {
         margin-top: 0rem;
         margin-bottom: 0rem;
