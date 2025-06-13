@@ -17,20 +17,33 @@
                     <input type="email" v-model="form.email" required />
                 </div>
 
-                <div class="form-group">
+                <div class="form-group password-group">
                     <label>Contraseña</label>
-                    <input type="password" v-model="form.password" required />
+                    <div class="input-password-wrapper input-password-inside">
+                        <input :type="mostrarPassword ? 'text' : 'password'" v-model="form.password" required />
+                        <button type="button" class="btn-ver-inside" @click="mostrarPassword = !mostrarPassword"
+                            tabindex="-1">
+                            <font-awesome-icon :icon="mostrarPassword ? 'eye-slash' : 'eye'"></font-awesome-icon>
+                        </button>
+                    </div>
                 </div>
 
-                <div v-if="!isLogin" class="form-group">
+                <div v-if="!isLogin" class="form-group password-group">
                     <label>Confirmar contraseña</label>
-                    <input type="password" v-model="form.password_confirmation" required />
+                    <div class="input-password-wrapper input-password-inside">
+                        <input :type="mostrarPassword ? 'text' : 'password'" v-model="form.password_confirmation"
+                            required />
+                        <button type="button" class="btn-ver-inside" @click="mostrarPassword = !mostrarPassword"
+                            tabindex="-1">
+                            <font-awesome-icon :icon="mostrarPassword ? 'eye-slash' : 'eye'"></font-awesome-icon>
+                        </button>
+                    </div>
                 </div>
 
                 <button type="submit">{{ isLogin ? 'Iniciar sesión' : 'Registrarse' }}</button>
             </form>
         </div>
-        <Toast group="br" position="bottom-right"/>
+        <Toast group="br" position="bottom-right" />
     </div>
 </template>
 
@@ -39,6 +52,7 @@ import { ref, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast';
 import axios from 'axios'
+import { icon } from '@fortawesome/fontawesome-svg-core';
 
 const isLogin = ref(true)
 const router = useRouter()
@@ -50,6 +64,8 @@ const form = ref({
     password: '',
     password_confirmation: ''
 })
+
+const mostrarPassword = ref(false)
 
 async function login() {
     try {
@@ -91,6 +107,7 @@ watch(isLogin, () => {
     form.value.email = ''
     form.value.password = ''
     form.value.password_confirmation = ''
+    mostrarPassword.value = false
 })
 </script>
 
@@ -98,13 +115,14 @@ watch(isLogin, () => {
 .container {
     padding-top: 7rem;
 }
+
 .login-register-container {
     max-width: 400px;
     margin: 0 auto;
     padding: 2rem;
     background: #f4f4f4;
     border-radius: 12px;
-    box-shadow: 0 2px 16px 0 rgba(0,0,0,0.08);
+    box-shadow: 0 2px 16px 0 rgba(0, 0, 0, 0.08);
 }
 
 .form-toggle {
@@ -140,6 +158,58 @@ label {
     color: black;
 }
 
+.input-password-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+}
+
+.input-password-wrapper.input-password-inside {
+    position: relative;
+    padding: 0;
+    align-items: stretch;
+}
+
+.input-password-wrapper.input-password-inside input {
+    padding-right: 2.2em;
+}
+
+.btn-ver-inside {
+    position: absolute;
+    right: 0.4em;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--secondary-color);
+    cursor: pointer;
+    font-size: 1.1em;
+    padding: 0 0.3em;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    z-index: 2;
+}
+
+.btn-ver-inside:focus {
+    outline: none;
+}
+
+.btn-ver {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 0.95em;
+    padding: 0 0.5em;
+    transition: color 0.2s;
+}
+
+.btn-ver:hover {
+    color: var(--secondary-color);
+}
+
 input {
     width: 100%;
     padding: 8px;
@@ -150,6 +220,7 @@ input {
     color: black;
     outline: none;
 }
+
 input:focus {
     outline: none;
     box-shadow: none;

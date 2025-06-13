@@ -140,9 +140,8 @@
                 </div>
             </div>
             <div class="modal-footer mt-3 d-flex gap-2">
-                <button type="button" class="btn btn-secondary" @click="dialogVisible = false">Cancelar</button>
                 <button type="submit" class="btn btn-primary"
-                    :disabled="!listaSeleccionada || !listasPersonalizadas.length">Añadir</button>
+                    :disabled="!listaSeleccionada || !listasPersonalizadas.length"><font-awesome-icon :icon="'plus'" /></button>
             </div>
         </form>
     </Dialog>
@@ -164,8 +163,7 @@
                     maxlength="500"></textarea>
             </div>
             <div class="modal-footer mt-3 d-flex gap-2 justify-content-end">
-                <button type="button" class="btn btn-secondary" @click="dialogPuntuarVisible = false">Cancelar</button>
-                <button type="submit" class="btn btn-primary" :disabled="puntuacion === 0">Enviar</button>
+                <button type="submit" class="btn btn-primary" :disabled="puntuacion === 0"><font-awesome-icon :icon="'plus'" /></button>
             </div>
         </form>
     </Dialog>
