@@ -77,7 +77,6 @@ const descripcion = ref('')
 const modoEdicion = ref(false)
 const lista = ref([])
 const usuarioId = ref([])
-const modalBorrarListaRef = ref(null)
 const toast = useToast();
 const dialogBorrarVisible = ref(false);
 const nombreListaEdit = ref('');
@@ -151,7 +150,6 @@ async function fetchProduccionesLista() {
         if (producciones.value.length > 0 && producciones.value[0].lista_personalizada) {
             descripcion.value = producciones.value[0].lista_personalizada.descripcion
         }
-        // Inicializa los valores editables
         setEditValues();
     } catch (error) {
         producciones.value = []
@@ -198,7 +196,7 @@ async function borrarListaConfirmada() {
         )
         dialogBorrarVisible.value = false;
         toast.add({ severity: 'success', summary: 'Éxito', detail: 'Lista eliminada correctamente', life: 3000, group: 'br' });
-        router.push(`/perfil/${usuarioId.value.id}`)
+        router.push(`/perfil`)
     } catch (error) {
         toast.add({ severity: 'warn', summary: 'Atención', detail: 'No se pudo eliminar la lista.', life: 3000, group: 'br' });
     }

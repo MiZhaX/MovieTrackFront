@@ -49,7 +49,7 @@ onMounted(async () => {
 
 function irAComenzar() {
   if (user.value && user.value.id) {
-    router.push(`/perfil/${user.value.id}`)
+    router.push(`/perfil`)
   } else {
     router.push('/login')
   }

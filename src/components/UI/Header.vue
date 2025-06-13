@@ -27,7 +27,7 @@
                 <RouterLink to="/login" class="enlace inicioSesion">Iniciar sesión</RouterLink>
             </div>
             <div v-else class="d-none d-md-flex d-flex align-items-center gap-2">
-                <RouterLink :to="`/perfil/${user.id}`" class="enlace inicioSesion">
+                <RouterLink :to="`/perfil`" class="enlace inicioSesion">
                     Mi Perfil
                 </RouterLink>
                 <p class="enlace inicioSesion" @click="logout">
@@ -76,7 +76,7 @@ const updateMenuItems = () => {
         { label: 'Ranking', command: () => router.push('/ranking') },
         { separator: true },
         user.value
-            ? { label: 'Mi Perfil', command: () => router.push(`/perfil/${user.value.id}`) }
+            ? { label: 'Mi Perfil', command: () => router.push(`/perfil`) }
             : { label: 'Iniciar sesión', command: () => router.push('/login') },
         user.value
             ? { label: 'Cerrar sesión', command: logout }

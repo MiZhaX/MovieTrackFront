@@ -5,7 +5,7 @@
             <RouterLink to="/peliculas" class="footer-link">Películas</RouterLink>
             <RouterLink to="/series" class="footer-link">Series</RouterLink>
             <RouterLink to="/ranking" class="footer-link">Ranking</RouterLink>
-            <RouterLink v-if="user" :to="`/perfil/${user.id}`" class="footer-link">Mi Perfil</RouterLink>
+            <RouterLink v-if="user" :to="`/perfil`" class="footer-link">Mi Perfil</RouterLink>
             <RouterLink v-else :to="`/login`" class="footer-link">Mi Perfil</RouterLink>
         </nav>
         <p class="footer-copy">© {{ new Date().getFullYear() }} MovieTrack</p>
