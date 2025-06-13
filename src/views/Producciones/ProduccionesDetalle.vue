@@ -68,8 +68,7 @@
                         </div>
                         <div class="acciones mt-4 d-flex justify-content-between">
                             <div class="botones d-flex">
-                                <button class="btn me-2 btn-primary"
-                                    @click="abrirDialogResena">Reseña</button>
+                                <button class="btn me-2 btn-primary" @click="abrirDialogResena">Reseña</button>
                                 <button class="btn me-2 btn-primary" @click="abrirModalLista">Añadir a lista</button>
                             </div>
                             <div class="marcas">
@@ -93,8 +92,40 @@
                     </div>
                 </div>
             </div>
+            <div v-if="true" class="mt-6">
+                <Carousel :value="resenasAleatorias.length ? resenasAleatorias : [{}]" :numVisible="1" :numScroll="1"
+                    circular :showNavigators="(resenasAleatorias.length > 1)"
+                    :showIndicators="(resenasAleatorias.length > 1)">
+                    <template #item="slotProps">
+                        <div v-if="resenasAleatorias.length" class="reseña-card p-3">
+                            <div class="d-flex align-items-center mb-2 justify-content-center gap-4">
+                                <img :src="`https://ui-avatars.com/api/?name=${slotProps.data.usuario?.name || ''}`"
+                                    alt="usuario" class="perfil-avatar">
+                                <span class="fw-bold">{{ slotProps.data.usuario?.name || 'Usuario' }}</span>
+                            </div>
+                            <div class="mb-2 text-center">
+                                <span v-for="n in 5" :key="n" class="estrella"
+                                    :class="{ activa: slotProps.data.puntuacion >= n }">
+                                    <font-awesome-icon :icon="'star'" />
+                                </span>
+                            </div>
+                            <div class="descripcion">
+                                <p class="mb-0 text-center">{{ slotProps.data.descripcion || '' }}</p>
+                            </div>
+                        </div>
+                        <div v-else class="reseña-card p-3 d-flex align-items-center justify-content-center"
+                            style="min-height:180px;">
+                            <p class="mb-0 text-center w-100">
+                                Esta producción aún no tiene reseñas.<br>
+                                <span class="fw-bold">¡Sé el primero en dar tu opinión!</span>
+                            </p>
+                        </div>
+                    </template>
+                </Carousel>
+            </div>
         </div>
     </div>
+
     <Toast group="br" position="bottom-right" />
     <Dialog v-model:visible="dialogVisible" modal header="Añadir a lista">
         <form @submit.prevent="añadirALista">
@@ -152,6 +183,7 @@ import ActorCard from '@/components/ActorCard.vue';
 import DirectorCard from '@/components/DirectorCard.vue';
 import { useToast } from 'primevue/usetoast';
 import Dialog from 'primevue/dialog';
+import Carousel from 'primevue/carousel';
 
 const route = useRoute();
 const produccion = ref(null);
@@ -176,6 +208,7 @@ const hoverPuntuacion = ref(0)
 const descripcionResena = ref('')
 const puntuacionOriginal = ref(null)
 const descripcionOriginal = ref('')
+const resenasAleatorias = ref([]);
 
 
 function abrirModalLista() {
@@ -195,6 +228,29 @@ function abrirDialogResena() {
         return;
     }
     dialogPuntuarVisible.value = true;
+}
+
+async function fetchResenasAleatorias() {
+    resenasAleatorias.value = [];
+    if (!produccion.value) return;
+    try {
+        cargando.value = true;
+        const { data } = await axios.get(
+            `https://movietrackapi.up.railway.app/api/v1/resenas?produccion_id[eq]=${produccion.value.id}&includeDetalles=true`
+        );
+        const total = data.meta?.total || 0;
+        let resenas = data.data || [];
+        if (resenas.length > 5) {
+            const shuffled = resenas.sort(() => 0.5 - Math.random());
+            resenasAleatorias.value = shuffled.slice(0, 5);
+        } else {
+            resenasAleatorias.value = resenas;
+        }
+    } catch (error) {
+        resenasAleatorias.value = [];
+    } finally {
+        cargando.value = false;
+    }
 }
 
 async function enviarResena() {
@@ -254,6 +310,7 @@ async function enviarResena() {
         }
 
         toast.add({ severity: 'success', summary: '¡Gracias!', detail: 'Reseña guardada correctamente.', life: 3000, group: 'br' });
+        fetchResenasAleatorias()
         dialogPuntuarVisible.value = false;
         puntuacionOriginal.value = puntuacion.value;
         descripcionOriginal.value = descripcionResena.value;
@@ -319,6 +376,24 @@ const fetchProduccion = async () => {
         const response = await axios.get(`https://movietrackapi.up.railway.app/api/v1/producciones/${produccionId}`);
         produccion.value = response.data.data;
         posterPath.value = `/assets/img/producciones/${produccion.value.id}.webp`;
+
+        resenasAleatorias.value = [];
+        if (!produccion.value) return;
+        try {
+            const { data } = await axios.get(
+                `https://movietrackapi.up.railway.app/api/v1/resenas?produccion_id[eq]=${produccion.value.id}&includeDetalles=true`
+            );
+            const total = data.meta?.total || 0;
+            let resenas = data.data || [];
+            if (resenas.length > 5) {
+                const shuffled = resenas.sort(() => 0.5 - Math.random());
+                resenasAleatorias.value = shuffled.slice(0, 5);
+            } else {
+                resenasAleatorias.value = resenas;
+            }
+        } catch (error) {
+            resenasAleatorias.value = [];
+        }
     } catch (error) {
         console.error('Error fetching produccion:', error);
     } finally {
@@ -516,7 +591,9 @@ function puntuarProduccion() {
     background-color: var(--cuaternary-color);
     padding-bottom: 1rem;
     border-radius: 10px;
-    padding-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
 }
 
 .resumenDetalles {
@@ -657,6 +734,29 @@ textarea.form-control:focus {
     box-shadow: none;
 }
 
+.reseña-card {
+    background: var(--cuaternary-color);
+    border-radius: 10px;
+    height: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.perfil-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 16px;
+    background: #fff;
+    object-fit: cover;
+    border: 2px solid #888;
+}
+
+.descripcion {
+    max-height: 120px;
+    overflow-y: auto;
+}
+
 @media (max-width: 1270px) {
     .contenedor {
         margin-top: 1rem;
@@ -735,6 +835,19 @@ textarea.form-control:focus {
     .me-2 {
         margin-right: 0 !important;
     }
+
+    .perfil-avatar {
+        width: 75px;
+        height: 75px;
+    }
+
+    .descripcion p {
+        font-size: smaller;
+    }
+
+    .reseña-card {
+        max-width: 300px;
+    }
 }
 
 @media (max-width: 415px) {
@@ -761,6 +874,16 @@ textarea.form-control:focus {
 
     .marcas {
         align-items: center;
+    }
+
+    .reseña-card {
+        max-width: 270px;
+    }
+}
+
+@media (max-width: 321px) {
+    .reseña-card {
+        max-width: 200px;
     }
 }
 </style>
