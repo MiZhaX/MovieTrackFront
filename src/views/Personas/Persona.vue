@@ -93,6 +93,7 @@ const fetchPersona = async () => {
         const personaId = route.params.personaId;
         const response = await axios.get(`https://movietrackapi.up.railway.app/api/v1/personas/${personaId}`);
         persona.value = response.data.data;
+        posterPath.value = `/assets/img/personas/${persona.value.id}.webp`;
     } catch (error) {
         if (error.response && error.response.status === 404) {
             router.push('/');

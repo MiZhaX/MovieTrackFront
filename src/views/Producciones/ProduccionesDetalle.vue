@@ -724,6 +724,15 @@ function puntuarProduccion() {
     color: #FFD700;
 }
 
+.reseña-card {
+  background: var(--cuaternary-color);
+  border-radius: 10px;
+  height: 100%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  margin: 0 auto;
+}
+
 textarea.form-control {
     resize: vertical;
 }

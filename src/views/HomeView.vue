@@ -96,7 +96,6 @@ onMounted(async () => {
       [todas[i], todas[j]] = [todas[j], todas[i]];
     }
     resenasAleatorias.value = todas.slice(0, 5);
-    console.log(resenasAleatorias.value);
   } catch (e) {
     resenasAleatorias.value = [];
   }
