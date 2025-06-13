@@ -68,7 +68,7 @@
 </template>
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
 
 import axios from 'axios';
@@ -79,6 +79,7 @@ const persona = ref(null);
 const cargando = ref(true);
 const posterPath = ref('');
 const route = useRoute();
+const router = useRouter();
 const toast = useToast();
 
 const handleImageError = (event) => {
@@ -92,9 +93,12 @@ const fetchPersona = async () => {
         const personaId = route.params.personaId;
         const response = await axios.get(`https://movietrackapi.up.railway.app/api/v1/personas/${personaId}`);
         persona.value = response.data.data;
-        posterPath.value = `/assets/img/personas/${persona.value.id}.webp`;
     } catch (error) {
-        toast.add({ severity: 'warn', summary: 'Error', detail: 'Error al obtener los datos de la persona', life: 3000, group: 'br' });
+        if (error.response && error.response.status === 404) {
+            router.push('/');
+        } else {
+            toast.add({ severity: 'warn', summary: 'Error', detail: 'Error al obtener los datos de la persona', life: 3000, group: 'br' });
+        }
     } finally {
         cargando.value = false;
     }

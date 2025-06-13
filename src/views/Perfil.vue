@@ -39,8 +39,8 @@
                             </button>
                         </div>
                         <div v-if="user.playlists && user.playlists.length > 0" class="listas-scroll">
-                            <RouterLink v-for="lista in user.playlists" :key="lista.id"
-                                :to="`/listas/${lista.nombre}/${lista.id}`" class="lista-card">
+                            <RouterLink v-for="lista in user.playlists" :key="lista.id" :to="`/listas/${lista.id}`"
+                                class="lista-card">
                                 <div class="lista-card-img">
                                     <font-awesome-icon :icon="['fas', 'list']" size="2x" />
                                 </div>
@@ -297,6 +297,7 @@ async function fetchListasReproduccion() {
 .relleno {
     min-height: 12vh;
 }
+
 .perfil-layout {
     padding: 2rem 0;
 }

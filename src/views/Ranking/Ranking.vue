@@ -30,15 +30,18 @@
       </div>
     </div>
   </div>
+  <Toast group="br" position="bottom-right" />
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue'
+import { useToast } from 'primevue/usetoast';
 import axios from 'axios'
 import Loading from '@/components/UI/Loading.vue'
 
 const producciones = ref([])
 const loading = ref(true)
+const toast = useToast();
 
 const getPosterPath = (id) => {
   return `/assets/img/producciones/${id}.webp`
@@ -66,7 +69,7 @@ onMounted(async () => {
     const res = await axios.get('https://movietrackapi.up.railway.app/api/v1/ranking-critica?tipo[eq]=pelicula')
     producciones.value = res.data.data
   } catch (error) {
-    console.error('Error al obtener el ranking:', error)
+    toast.add({ severity: 'warn', summary: 'Error', detail: 'Error al obtener los datos del ranking', life: 3000, group: 'br' });
   } finally {
     loading.value = false
   }

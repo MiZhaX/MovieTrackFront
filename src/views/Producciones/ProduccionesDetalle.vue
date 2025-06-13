@@ -93,35 +93,32 @@
                 </div>
             </div>
             <div v-if="true" class="mt-6">
-                <Carousel :value="resenasAleatorias.length ? resenasAleatorias : [{}]" :numVisible="1" :numScroll="1"
-                    circular :showNavigators="(resenasAleatorias.length > 1)"
-                    :showIndicators="(resenasAleatorias.length > 1)">
+                <Carousel
+                    v-if="resenasAleatorias.length > 1"
+                    :value="resenasAleatorias"
+                    :numVisible="1"
+                    :numScroll="1"
+                    circular
+                    :showNavigators="true"
+                    :showIndicators="true"
+                    :touchable="true"
+                    :draggable="true"
+                >
                     <template #item="slotProps">
-                        <div v-if="resenasAleatorias.length" class="reseña-card p-3">
-                            <div class="d-flex align-items-center mb-2 justify-content-center gap-4">
-                                <img :src="`https://ui-avatars.com/api/?name=${slotProps.data.usuario?.name || ''}`"
-                                    alt="usuario" class="perfil-avatar">
-                                <span class="fw-bold">{{ slotProps.data.usuario?.name || 'Usuario' }}</span>
-                            </div>
-                            <div class="mb-2 text-center">
-                                <span v-for="n in 5" :key="n" class="estrella"
-                                    :class="{ activa: slotProps.data.puntuacion >= n }">
-                                    <font-awesome-icon :icon="'star'" />
-                                </span>
-                            </div>
-                            <div class="descripcion">
-                                <p class="mb-0 text-center">{{ slotProps.data.descripcion || '' }}</p>
-                            </div>
-                        </div>
-                        <div v-else class="reseña-card p-3 d-flex align-items-center justify-content-center"
-                            style="min-height:180px;">
-                            <p class="mb-0 text-center w-100">
-                                Esta producción aún no tiene reseñas.<br>
-                                <span class="fw-bold">¡Sé el primero en dar tu opinión!</span>
-                            </p>
-                        </div>
+                    <ResenaCard :resena="slotProps.data" />
                     </template>
                 </Carousel>
+
+                <div v-else-if="resenasAleatorias.length === 1">
+                    <ResenaCard :resena="resenasAleatorias[0]" />
+                </div>
+
+                <div v-else class="reseña-card p-3 d-flex align-items-center justify-content-center" style="min-height:180px;">
+                    <p class="mb-0 text-center w-100">
+                    Esta producción aún no tiene reseñas.<br />
+                    <span class="fw-bold">¡Sé el primero en dar tu opinión!</span>
+                    </p>
+                </div>
             </div>
         </div>
     </div>
@@ -179,11 +176,13 @@ import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import Loading from '@/components/UI/Loading.vue';
+import ResenaCard from '@/components/ResenaCard.vue';
 import ActorCard from '@/components/ActorCard.vue';
 import DirectorCard from '@/components/DirectorCard.vue';
 import { useToast } from 'primevue/usetoast';
 import Dialog from 'primevue/dialog';
 import Carousel from 'primevue/carousel';
+import { useRouter } from 'vue-router';
 
 const route = useRoute();
 const produccion = ref(null);
@@ -195,13 +194,10 @@ const visualizada = ref(false);
 const quieroVer = ref(false);
 const marca = ref(null);
 const imgRef = ref(null);
-
 const dialogVisible = ref(false);
 const listasPersonalizadas = ref([]);
-const modalListasRef = ref(null);
 const listaSeleccionada = ref('');
 const toast = useToast();
-
 const dialogPuntuarVisible = ref(false)
 const puntuacion = ref(0)
 const hoverPuntuacion = ref(0)
@@ -209,6 +205,7 @@ const descripcionResena = ref('')
 const puntuacionOriginal = ref(null)
 const descripcionOriginal = ref('')
 const resenasAleatorias = ref([]);
+const router = useRouter();
 
 
 function abrirModalLista() {
@@ -315,7 +312,6 @@ async function enviarResena() {
         puntuacionOriginal.value = puntuacion.value;
         descripcionOriginal.value = descripcionResena.value;
     } catch (error) {
-        console.log(error)
         toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo guardar la reseña.', life: 3000, group: 'br' });
     }
 }
@@ -365,7 +361,6 @@ async function añadirALista() {
         dialogVisible.value = false;
     } catch (error) {
         toast.add({ severity: 'warn', summary: 'Atención', detail: 'Ya existe esta producción en la lista.', life: 3000, group: 'br' });
-        console.error(error);
     }
 }
 
@@ -395,7 +390,11 @@ const fetchProduccion = async () => {
             resenasAleatorias.value = [];
         }
     } catch (error) {
-        console.error('Error fetching produccion:', error);
+        if (error.response && error.response.status === 404) {
+            router.push('/');
+        } else {
+            toast.add({ severity: 'warn', summary: 'Error', detail: 'Error al obtener los datos de la producción', life: 3000, group: 'br' });
+        }
     } finally {
         cargando.value = false;
     }
@@ -415,7 +414,7 @@ async function fetchListasPersonalizadas() {
         );
         listasPersonalizadas.value = response.data.data || [];
     } catch (error) {
-        console.error('Error obteniendo listas personalizadas:', error);
+        toast.add({ severity: 'warn', summary: 'Error', detail: 'Error al obtener las listas', life: 3000, group: 'br' });
         listasPersonalizadas.value = [];
     }
 }
@@ -734,29 +733,6 @@ textarea.form-control:focus {
     box-shadow: none;
 }
 
-.reseña-card {
-    background: var(--cuaternary-color);
-    border-radius: 10px;
-    height: 100%;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
-    margin: 0 auto;
-}
-
-.perfil-avatar {
-    width: 100px;
-    height: 100px;
-    border-radius: 16px;
-    background: #fff;
-    object-fit: cover;
-    border: 2px solid #888;
-}
-
-.descripcion {
-    max-height: 120px;
-    overflow-y: auto;
-}
-
 @media (max-width: 1270px) {
     .contenedor {
         margin-top: 1rem;
@@ -840,14 +816,6 @@ textarea.form-control:focus {
         width: 75px;
         height: 75px;
     }
-
-    .descripcion p {
-        font-size: smaller;
-    }
-
-    .reseña-card {
-        max-width: 300px;
-    }
 }
 
 @media (max-width: 415px) {
@@ -878,12 +846,6 @@ textarea.form-control:focus {
 
     .reseña-card {
         max-width: 270px;
-    }
-}
-
-@media (max-width: 321px) {
-    .reseña-card {
-        max-width: 200px;
     }
 }
 </style>

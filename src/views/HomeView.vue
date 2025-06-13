@@ -4,21 +4,53 @@
     <div class="contenedor">
       <section class="hero">
         <div class="hero-content">
-          <h2 class="h1 mr-4 ml-4">Descubre, organiza y comparte tus películas y series favoritas</h2>
-          <p class="h5 mr-4 ml-4"><strong>MovieTrack</strong> te ayuda a llevar el control de lo que ves, lo que sueñas
-            ver y
-            quién te inspira en la pantalla.</p>
-          <button class="btn-principal" @click="irAComenzar">Comienza ahora</button>
+          <h2 class="h1 mr-4 ml-4">
+            Descubre, organiza y comparte tus películas y series favoritas
+          </h2>
+          <p class="h5 mr-4 ml-4">
+            <strong>MovieTrack</strong> te ayuda a llevar el control de lo que
+            ves, lo que sueñas ver y quién te inspira en la pantalla.
+          </p>
+          <button class="btn-principal" @click="irAComenzar">
+            Comienza ahora
+          </button>
         </div>
       </section>
       <div class="info-landing">
         <section class="estrenos">
-          <h2 class="titulo">Últimos Estrenos</h2>
-          <div v-if="estrenos && estrenos.length === 0">No hay estrenos disponibles.</div>
+          <h2 class="titulo">Novedades en taquilla</h2>
+          <div v-if="estrenos && estrenos.length === 0">
+            No hay estrenos disponibles.
+          </div>
           <div v-else class="gridPeliculas">
             <ProduccionCard v-for="p in estrenos" :key="p.id" :produccion="p" :tamano="200" :detalles="false"
               :fecha="true" />
           </div>
+        </section>
+        <section class="reseñas-home mt-5">
+          <h2 class="titulo">Opiniones de la comunidad</h2>
+          <Carousel v-if="resenasAleatorias.length > 0" :value="resenasAleatorias" :numVisible="1" :numScroll="1"
+            :showNavigators="resenasAleatorias.length > 1" :showIndicators="resenasAleatorias.length > 1"
+            :touchable="resenasAleatorias.length > 1" :draggable="resenasAleatorias.length > 1"
+            class="carousel-reseñas">
+            <template #item="slotProps">
+              <ResenaHomeCard :resena="slotProps.data" />
+            </template>
+          </Carousel>
+          <div v-else class="text-center">No hay reseñas disponibles.</div>
+        </section>
+        <section class="recomendar-home mt-5 mb-5">
+          <h2 class="titulo">¿No encuentras una película o serie?</h2>
+          <form class="form-recomendar d-flex flex-column align-items-center" @submit.prevent="enviarRecomendacion">
+            <p class="text-center">¿Tienes una película o serie que no encuentras aquí? ¡Recomiéndanosla y la
+              agregaremos a
+              MovieTrack!</p>
+            <div class="inputRecomendar d-flex gap-4">
+              <input id="nombrePelicula" v-model="nombrePelicula" class="input" required maxlength="100"
+                placeholder="Nombre de la película o serie..." />
+              <button type="submit" class="btn btn-primary" :disabled="!nombrePelicula.trim()">Recomendar</button>
+            </div>
+          </form>
         </section>
       </div>
     </div>
@@ -26,32 +58,67 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import axios from 'axios'
-import ProduccionCard from '@/components/ProductionCard.vue'
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import axios from "axios";
+import ProduccionCard from "@/components/ProductionCard.vue";
+import Carousel from "primevue/carousel";
+import ResenaHomeCard from "@/components/ResenaHomeCard.vue";
+import { useToast } from 'primevue/usetoast';
 
-const router = useRouter()
-const estrenos = ref([])
-const error = ref(null)
-const user = ref(null)
+const router = useRouter();
+const estrenos = ref([]);
+const error = ref(null);
+const user = ref(null);
+const resenasAleatorias = ref([]);
+const nombrePelicula = ref('');
+const toast = useToast();
 
 onMounted(async () => {
-  const storedUser = localStorage.getItem('user')
-  user.value = storedUser ? JSON.parse(storedUser) : null
+  const storedUser = localStorage.getItem("user");
+  user.value = storedUser ? JSON.parse(storedUser) : null;
   try {
-    const { data } = await axios.get('https://movietrackapi.up.railway.app/api/v1/estrenos')
-    estrenos.value = data?.data || []
+    const { data } = await axios.get(
+      "https://movietrackapi.up.railway.app/api/v1/estrenos"
+    );
+    estrenos.value = data?.data || [];
   } catch (e) {
-    error.value = 'No se pudieron cargar los estrenos.'
+    error.value = "No se pudieron cargar los estrenos.";
   }
-})
+
+  try {
+    const { data } = await axios.get(
+      "https://movietrackapi.up.railway.app/api/v1/resenas?includeDetalles=true"
+    );
+    let todas = data?.data || [];
+    for (let i = todas.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [todas[i], todas[j]] = [todas[j], todas[i]];
+    }
+    resenasAleatorias.value = todas.slice(0, 5);
+    console.log(resenasAleatorias.value);
+  } catch (e) {
+    resenasAleatorias.value = [];
+  }
+});
 
 function irAComenzar() {
   if (user.value && user.value.id) {
-    router.push(`/perfil`)
+    router.push(`/perfil`);
   } else {
-    router.push('/login')
+    router.push("/login");
+  }
+}
+
+async function enviarRecomendacion() {
+  try {
+    await axios.post('https://movietrackapi.up.railway.app/api/v1/recomendarPelicula', {
+      nombre_pelicula: nombrePelicula.value,
+    });
+    toast.add({ severity: 'success', summary: 'Recomendación Realizada', detail: '¡Gracias por tu recomendación!', life: 3000, group: 'br' });
+    nombrePelicula.value = '';
+  } catch (e) {
+    toast.add({ severity: 'warn', summary: 'Error', detail: 'No se pudo enviar la recomendación. Inténtalo más tarde.', life: 3000, group: 'br' });
   }
 }
 </script>
@@ -73,7 +140,7 @@ function irAComenzar() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-image: url('/assets/img/landing-hero.jpg');
+  background-image: url("/assets/img/landing-hero.jpg");
   background-size: cover;
   background-position: center;
 }
@@ -131,6 +198,25 @@ function irAComenzar() {
   margin-top: 1rem;
 }
 
+.form-recomendar input.input {
+  width: 500px;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--terciary-color);
+  background-color: var(--terciary-color);
+  caret-color: var(--primary-color);
+  color: black;
+}
+
+.form-recomendar input.input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.form-recomendar button.btn {
+  min-width: 120px;
+}
+
 @media (max-width: 1375px) {
   .info-landing {
     margin-right: 3rem;
@@ -161,6 +247,12 @@ function irAComenzar() {
   }
 }
 
+@media (max-width: 700px) {
+  .form-recomendar input.input {
+    width: 300px;
+  }
+}
+
 @media (max-width: 480px) {
   .info-landing {
     margin-right: 0.5rem;
@@ -170,6 +262,10 @@ function irAComenzar() {
   .gridPeliculas {
     gap: 10px;
     grid-template-columns: repeat(3, minmax(130px, 1fr));
+  }
+
+  .form-recomendar input.input {
+    width: 200px;
   }
 }
 

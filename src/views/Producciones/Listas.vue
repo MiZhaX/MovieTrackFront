@@ -146,7 +146,7 @@ async function fetchProduccionesLista() {
         lista.value = response.data.data
         descripcion.value = lista.value.descripcion
         producciones.value = response.data.data.produccionesListas || []
-        nombreLista.value = route.params.listaNombre
+        nombreLista.value = response.data.data.nombre
         if (producciones.value.length > 0 && producciones.value[0].lista_personalizada) {
             descripcion.value = producciones.value[0].lista_personalizada.descripcion
         }

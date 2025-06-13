@@ -24,7 +24,7 @@
             </div>
 
             <div v-if="!user" class="d-none d-md-flex">
-                <RouterLink to="/login" class="enlace inicioSesion">Iniciar sesión</RouterLink>
+                <RouterLink to="/login" class="enlace inicioSesion">Entrar</RouterLink>
             </div>
             <div v-else class="d-none d-md-flex d-flex align-items-center gap-2">
                 <RouterLink :to="`/perfil`" class="enlace inicioSesion">
