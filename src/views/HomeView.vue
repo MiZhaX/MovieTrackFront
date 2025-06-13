@@ -88,14 +88,9 @@ onMounted(async () => {
 
   try {
     const { data } = await axios.get(
-      "https://movietrackapi.up.railway.app/api/v1/resenas?includeDetalles=true"
+      "https://movietrackapi.up.railway.app/api/v1/resenasAleatorias"
     );
-    let todas = data?.data || [];
-    for (let i = todas.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [todas[i], todas[j]] = [todas[j], todas[i]];
-    }
-    resenasAleatorias.value = todas.slice(0, 5);
+    resenasAleatorias.value = data?.data || [];
   } catch (e) {
     resenasAleatorias.value = [];
   }
