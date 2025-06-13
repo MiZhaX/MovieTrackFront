@@ -63,7 +63,7 @@ function obtenerAño(fecha) {
 
 onMounted(async () => {
   try {
-    const res = await axios.get('https://movietrackapi.up.railway.app/api/v1/ranking-critica')
+    const res = await axios.get('https://movietrackapi.up.railway.app/api/v1/ranking-critica?tipo[eq]=pelicula')
     producciones.value = res.data.data
   } catch (error) {
     console.error('Error al obtener el ranking:', error)
