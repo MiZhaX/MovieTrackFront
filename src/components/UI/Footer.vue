@@ -1,6 +1,6 @@
 <template>
     <footer class="footer">
-        <nav class="footer-nav">
+        <nav class="footer-nav" aria-label="Navegación de pie de página">
             <RouterLink to="/" class="footer-link">Inicio</RouterLink>
             <RouterLink to="/peliculas" class="footer-link">Películas</RouterLink>
             <RouterLink to="/series" class="footer-link">Series</RouterLink>

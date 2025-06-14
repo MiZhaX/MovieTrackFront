@@ -1,5 +1,5 @@
 <template>
-    <nav :class="{ fixed: true, reducido: scrolled }">
+    <nav :class="{ fixed: true, reducido: scrolled }" aria-label="Navegación principal">
         <div class="cabecera">
             <RouterLink to="/" class="enlace linkLogo">
                 <img src="../../assets/img/logo.png" alt="logoMovieTrack" class="logo">
@@ -22,7 +22,7 @@
                     </RouterLink>
                 </div>
 
-                <button class="menu-toggle d-md-none" @click="toggleMenu">
+                <button class="menu-toggle d-md-none" @click="toggleMenu" aria-label="Abrir menú de navegación">
                     <i :class="'pi pi-bars'"></i>
                 </button>
             </div>
