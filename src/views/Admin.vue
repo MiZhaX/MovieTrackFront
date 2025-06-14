@@ -104,7 +104,7 @@
                             </div>
                             <div v-if="produccionDesasociarSeleccionada" class="seleccionado">
                                 <span>Producción seleccionada: <b>{{ produccionDesasociarSeleccionada.titulo
-                                        }}</b></span>
+                                }}</b></span>
                                 <button type="button" @click="produccionDesasociarSeleccionada = null">Quitar</button>
                             </div>
                             <div class="dropdown-container">
@@ -202,7 +202,7 @@
                             </div>
                             <div v-if="produccionDesasociarDirectorSeleccionada" class="seleccionado">
                                 <span>Producción seleccionada: <b>{{ produccionDesasociarDirectorSeleccionada.titulo
-                                }}</b></span>
+                                        }}</b></span>
                                 <button type="button"
                                     @click="produccionDesasociarDirectorSeleccionada = null">Quitar</button>
                             </div>
@@ -223,7 +223,7 @@
                             </div>
                             <div v-if="personaDesasociarDirectorSeleccionada" class="seleccionado">
                                 <span>Persona seleccionada: <b>{{ personaDesasociarDirectorSeleccionada.nombre
-                                }}</b></span>
+                                        }}</b></span>
                                 <button type="button"
                                     @click="personaDesasociarDirectorSeleccionada = null">Quitar</button>
                             </div>
@@ -245,7 +245,8 @@
                         <input v-model="nuevaPersona.fecha_nacimiento" placeholder="Fecha de nacimiento" type="date"
                             required />
                         <textarea v-model="nuevaPersona.biografia" placeholder="Biografía" required></textarea>
-                        <input type="file" @change="onFileChangePersona" accept="image/*" required />
+                        <input type="file" @change="onFileChangePersona" accept="image/*" required
+                            ref="personaInputRef" />
                         <button type="submit">Crear Persona</button>
                     </form>
                 </div>
@@ -286,6 +287,7 @@ const mostrarDropdownPersona = ref(false);
 const personaSeleccionada = ref(null);
 
 const rolActor = ref('');
+const personaInputRef = ref(null);
 
 // Estado y refs para asociar director
 const busquedaProduccionDirector = ref('');
@@ -444,7 +446,12 @@ const crearPersona = async () => {
                 fecha_nacimiento: '',
                 biografia: ''
             };
+
             personaFile.value = null;
+            // Limpia el input file visualmente si tienes una referencia
+            if (personaInputRef.value) {
+                personaInputRef.value.value = '';
+            }
         } else {
             toast.add({ severity: 'warn', summary: 'Error', detail: 'No se ha creado la persona', life: 3000, group: 'br' });
         }
