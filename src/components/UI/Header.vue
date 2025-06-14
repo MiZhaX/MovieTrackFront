@@ -81,7 +81,7 @@ const updateMenuItems = () => {
         { separator: true },
         user.value
             ? { label: 'Mi Perfil', command: () => router.push(`/perfil`) }
-            : { label: 'Iniciar sesión', command: () => router.push('/login') },
+            : { label: 'Entrar', command: () => router.push('/login') },
         user.value
             ? { label: 'Cerrar sesión', command: logout }
             : null,
