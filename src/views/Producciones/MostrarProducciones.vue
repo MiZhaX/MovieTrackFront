@@ -3,7 +3,12 @@
     <Loading :cargando="cargando" />
     <div v-if="!cargando" class="contenedor">
         <div>
-            <Filters :generoSeleccionado="generoSeleccionado" @filtrar-genero="filtrarPorGenero" />
+            <Filters
+                :generoSeleccionado="generoSeleccionado"
+                :valoracionSeleccionada="valoracionSeleccionada"
+                @filtrar-genero="filtrarPorGenero"
+                @filtrar-valoracion="filtrarPorValoracion"
+            />
 
             <div class="producciones">
                 <div v-if="producciones.length" class="gridPeliculas">
@@ -38,7 +43,8 @@ const producciones = ref([]);
 const cargando = ref(true);
 const currentPage = ref(1);
 const lastPage = ref(1);
-const generoSeleccionado = ref(''); 
+const generoSeleccionado = ref('');
+const valoracionSeleccionada = ref(''); // Nuevo estado para la valoración
 
 const fetchProducciones = async (page = 1) => {
     cargando.value = true;
@@ -47,6 +53,10 @@ const fetchProducciones = async (page = 1) => {
     let url = `https://movietrackapi.up.railway.app/api/v1/producciones?tipo[eq]=${tipo}&page=${page}`;
     if (generoSeleccionado.value) {
         url += `&genero_id[eq]=${generoSeleccionado.value}`;
+    }
+    // Agregar filtro de valoración si está seleccionado
+    if (valoracionSeleccionada.value !== '' && valoracionSeleccionada.value !== null) {
+        url += `&puntuacion_critica[gt]=${valoracionSeleccionada.value}`;
     }
 
     try {
@@ -68,12 +78,19 @@ const fetchProducciones = async (page = 1) => {
 };
 
 watch(() => route.path, () => {
-    generoSeleccionado.value = null;
+    generoSeleccionado.value = '';
+    valoracionSeleccionada.value = ''; // Resetear valoración al cambiar de ruta
     fetchProducciones(1);
 });
 
 const filtrarPorGenero = (id) => {
     generoSeleccionado.value = id || '';
+    fetchProducciones(1);
+};
+
+// Nuevo método para manejar el filtro de valoración
+const filtrarPorValoracion = (valor) => {
+    valoracionSeleccionada.value = valor || '';
     fetchProducciones(1);
 };
 

@@ -6,7 +6,7 @@
         <div class="row g-0">
           <div class="col-md-3 d-flex align-items-center justify-content-center p-2">
             <RouterLink :to="`/producciones/${produccion.id}`">
-              <img :src="getPosterPath(produccion.id)" class="img-fluid rounded" :alt="produccion.titulo"
+              <img :src="produccion.poster" class="img-fluid rounded" :alt="produccion.titulo"
                 @error="handleImageError" />
             </RouterLink>
           </div>
@@ -42,10 +42,6 @@ import Loading from '@/components/UI/Loading.vue'
 const producciones = ref([])
 const loading = ref(true)
 const toast = useToast();
-
-const getPosterPath = (id) => {
-  return `/assets/img/producciones/${id}.webp`
-}
 
 const handleImageError = (event) => {
   event.target.src = '/assets/img/default.png'

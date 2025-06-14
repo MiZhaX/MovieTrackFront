@@ -368,7 +368,8 @@ const fetchProduccion = async () => {
         const produccionId = route.params.produccionId;
         const response = await axios.get(`https://movietrackapi.up.railway.app/api/v1/producciones/${produccionId}`);
         produccion.value = response.data.data;
-        posterPath.value = `/assets/img/producciones/${produccion.value.id}.webp`;
+        posterPath.value = produccion.value.poster;
+        console.log(posterPath.value);
 
         resenasAleatorias.value = [];
         if (!produccion.value) return;

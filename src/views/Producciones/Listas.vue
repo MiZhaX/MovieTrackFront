@@ -30,8 +30,8 @@
                                 <font-awesome-icon :icon="'xmark'" />
                             </button>
                             <ProductionCard
-                                :produccion="{ id: p.produccion_id, titulo: p.titulo, puntuacion_critica: p.puntuacion_critica }"
-                                :tamano="150" :detalles="false" />
+                                :produccion="p.produccion"
+                                :tamano="150" :detalles="false" :nota="false" :fecha="false"/>
                         </div>
                     </div>
                 </div>
@@ -150,6 +150,7 @@ async function fetchProduccionesLista() {
         if (producciones.value.length > 0 && producciones.value[0].lista_personalizada) {
             descripcion.value = producciones.value[0].lista_personalizada.descripcion
         }
+        console.log(producciones.value)
         setEditValues();
     } catch (error) {
         producciones.value = []

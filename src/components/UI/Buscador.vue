@@ -6,7 +6,7 @@
             <template v-if="resultados.length">
                 <RouterLink v-for="produccion in resultados" :key="produccion.id" :to="`/producciones/${produccion.id}`"
                     class="resultado" @click="reset">
-                    <img :src="getPoster(produccion.id)" :alt="produccion.titulo" @error="ponerImagenPorDefecto" />
+                    <img :src="produccion.poster" :alt="produccion.titulo" @error="ponerImagenPorDefecto" />
                     <span>{{ produccion.titulo }}</span>
                 </RouterLink>
             </template>
@@ -75,8 +75,6 @@ function handleClickOutside(event) {
         mostrarDropdown.value = false;
     }
 }
-
-const getPoster = (id) => `/assets/img/producciones/${id}.webp`;
 
 const ponerImagenPorDefecto = (e) => {
     e.target.src = '/assets/img/default.png';

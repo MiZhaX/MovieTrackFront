@@ -18,7 +18,7 @@ const props = defineProps({
 });
 
 const imgRef = ref(null);
-const imagePath = `/assets/img/personas/${props.director.director.id}.webp`;
+const imagePath = props.director.director.imagen;
 
 function setDefaultImage() {
   if (imgRef.value) {

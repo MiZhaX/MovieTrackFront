@@ -37,7 +37,7 @@ const props = defineProps({
 
 const imgRef = ref(null);
 
-const posterPath = `/assets/img/producciones/${props.produccion.id}.webp`;
+const posterPath = props.produccion.poster;
 
 function setDefaultImage() {
   if (imgRef.value) {

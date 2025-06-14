@@ -20,8 +20,8 @@
                         <div v-if="user.favoriteMovies.length > 0" v-for="fav in user.favoriteMovies"
                             :key="fav.produccion_id" class="favorita-card">
                             <RouterLink :to="`/producciones/${fav.produccion_id}`">
-                                <img :src="`/assets/img/producciones/${fav.produccion_id}.webp` || '/assets/img/default.png'"
-                                    :alt="fav.title" />
+                                <img :src="fav.produccion.poster"
+                                    :alt="fav.produccion.nombre" @error="setDefaultImage($event)"/>
                             </RouterLink>
                         </div>
                         <div v-else>
@@ -64,8 +64,8 @@
                         <div v-if="peliculasFiltradas.length > 0" v-for="pelicula in peliculasFiltradas"
                             :key="pelicula.id" class="pelicula-card">
                             <RouterLink :to="`/producciones/${pelicula.produccion_id}`">
-                                <img :src="`/assets/img/producciones/${pelicula.produccion_id}.webp` || '/assets/img/default.png'"
-                                    :alt="pelicula.title" />
+                                <img :src="pelicula.poster"
+                                    :alt="pelicula.nombre" @error="setDefaultImage($event)"/>
                             </RouterLink>
                         </div>
                         <div v-else>
@@ -120,6 +120,7 @@ const quieroVer = ref([]);
 const cargando = ref(true);
 const dialogVisible = ref(false);
 const toast = useToast();
+const imgRef = ref(null);
 
 const tab = ref('visualizadas')
 
@@ -137,6 +138,10 @@ function abrirModal() {
     dialogVisible.value = true;
     nuevaLista.value.nombre = '';
     nuevaLista.value.descripcion = '';
+}
+
+function setDefaultImage(event) {
+    event.target.src = '/assets/img/default.png';
 }
 
 async function crearLista() {
@@ -194,11 +199,13 @@ onMounted(async () => {
             visualizadas.value = (watched.data || watched).map(marca => ({
                 id: marca.produccion_id,
                 produccion_id: marca.produccion_id,
+                poster: marca.produccion.poster,
                 title: marca.titulo || '',
             }))
             quieroVer.value = (toWatch.data || toWatch).map(marca => ({
                 id: marca.produccion_id,
                 produccion_id: marca.produccion_id,
+                poster: marca.produccion.poster,
                 title: marca.titulo || '',
             }))
         } catch (e) {
@@ -247,6 +254,7 @@ async function fetchProduccionesVistas() {
                 Authorization: `Bearer ${token}`
             }
         })
+        console.log(response.data.data)
         return response.data.data || []
     } catch (error) {
         toast.add({ severity: 'warn', summary: 'Error', detail: e.response?.data?.message || 'Error al obtener películas visualizadas', life: 3000, group: 'br' });

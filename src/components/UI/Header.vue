@@ -16,6 +16,10 @@
                     </RouterLink>
                     <RouterLink to="/ranking" class="enlace boton" :class="{ activa: isActive('/ranking') }">Ranking
                     </RouterLink>
+                    <RouterLink v-if="user && user.email === 'mbonelortiz@gmail.com'" to="/admin" class="enlace boton"
+                        :class="{ activa: isActive('/admin') }">
+                        Admin
+                    </RouterLink>
                 </div>
 
                 <button class="menu-toggle d-md-none" @click="toggleMenu">

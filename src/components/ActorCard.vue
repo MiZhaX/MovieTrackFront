@@ -20,7 +20,7 @@ const props = defineProps({
 
 const imgRef = ref(null);
 
-const imagePath = `/assets/img/personas/${props.persona.persona_id}.webp`;
+const imagePath = props.persona.actor.imagen;
 
 function setDefaultImage() {
   if (imgRef.value) {

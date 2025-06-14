@@ -57,6 +57,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/admin',
+      name: 'admin',
+      component: () => import('../views/Admin.vue'),
+      meta: { requiresAuth: true, requiresEmail: 'mbonelortiz@gmail.com' },
+    },
+    {
       path: '/:pathMatch(.*)*',
       redirect: '/'
     }

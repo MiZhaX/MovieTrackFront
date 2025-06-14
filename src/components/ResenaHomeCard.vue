@@ -14,7 +14,7 @@
     </div>
     <div class="produccion-info text-center">
       <router-link :to="`/producciones/${resena.produccion_id}`">
-        <img :src="`/assets/img/producciones/${resena.produccion_id}.webp`" :alt="resena.produccion?.titulo" class="poster-produccion" @error="setDefaultImage" />
+        <img :src="resena.produccion.poster" :alt="resena.produccion?.titulo" class="poster-produccion" @error="setDefaultImage" />
       </router-link>
     </div>
   </div>
