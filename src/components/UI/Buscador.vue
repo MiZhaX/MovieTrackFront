@@ -1,6 +1,6 @@
 <template>
     <div class="buscador-header" ref="buscadorRef">
-        <input v-model="termino" type="text" placeholder="Busca tu película o serie favorita..." class="input" />
+        <input v-model="termino" type="text" placeholder="Busca tu película o serie favorita..." class="input" aria-label="Buscador de producciones"/>
         <div v-if="mostrarDropdown" class="resultados"
             :class="{ 'd-flex': !resultados.length, 'justify-content-center': !resultados.length }">
             <template v-if="resultados.length">

@@ -47,7 +47,7 @@
               MovieTrack!</p>
             <div class="inputRecomendar d-flex gap-4">
               <input id="nombrePelicula" v-model="nombrePelicula" class="input" required maxlength="100"
-                placeholder="Nombre de la película o serie..." />
+                placeholder="Nombre de la película o serie..." aria-label="Recomendar producción"/>
               <button type="submit" class="btn btn-primary" :disabled="!nombrePelicula.trim()">Recomendar</button>
             </div>
           </form>
