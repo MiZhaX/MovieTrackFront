@@ -1,6 +1,7 @@
 <template>
     <div class="buscador-header" ref="buscadorRef">
-        <input v-model="termino" type="text" placeholder="Busca tu película o serie favorita..." class="input" aria-label="Buscador de producciones"/>
+        <input v-model="termino" type="text" placeholder="Busca tu película o serie favorita..." class="input"
+            aria-label="Buscador de producciones" />
         <div v-if="mostrarDropdown" class="resultados"
             :class="{ 'd-flex': !resultados.length, 'justify-content-center': !resultados.length }">
             <template v-if="resultados.length">
@@ -93,7 +94,8 @@ function abrirDialogRecomendar() {
 }
 
 async function enviarRecomendacion() {
-    const user = localStorage.getItem('user');
+    const storedUser = localStorage.getItem('user');
+    const user = storedUser ? JSON.parse(storedUser) : {};
     try {
         await axios.post('https://movietrackapi.up.railway.app/api/v1/recomendarPelicula', {
             nombre_pelicula: nombrePelicula.value,

@@ -105,7 +105,8 @@ function irAComenzar() {
 }
 
 async function enviarRecomendacion() {
-  const user = localStorage.getItem('user');
+  const storedUser = localStorage.getItem('user');
+  const user = storedUser ? JSON.parse(storedUser) : {};
   try {
     await axios.post('https://movietrackapi.up.railway.app/api/v1/recomendarPelicula', {
       nombre_pelicula: nombrePelicula.value,
