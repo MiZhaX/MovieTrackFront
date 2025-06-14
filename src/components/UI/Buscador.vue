@@ -93,9 +93,12 @@ function abrirDialogRecomendar() {
 }
 
 async function enviarRecomendacion() {
+    const user = localStorage.getItem('user');
     try {
         await axios.post('https://movietrackapi.up.railway.app/api/v1/recomendarPelicula', {
             nombre_pelicula: nombrePelicula.value,
+            nombre_usuario: user.name,
+            correo_usuario: user.email
         });
         toast.add({ severity: 'success', summary: 'Recomendación Realizada', detail: '¡Gracias por tu recomendación!', life: 3000, group: 'br' });
         nombrePelicula.value = '';
@@ -103,7 +106,6 @@ async function enviarRecomendacion() {
     } catch (e) {
         mensajeRecomendacion.value = '';
         toast.add({ severity: 'warn', summary: 'Error', detail: 'No se pudo enviar la recomendación. Inténtalo más tarde.', life: 3000, group: 'br' });
-
     }
 }
 

@@ -47,7 +47,7 @@
               MovieTrack!</p>
             <div class="inputRecomendar d-flex gap-4">
               <input id="nombrePelicula" v-model="nombrePelicula" class="input" required maxlength="100"
-                placeholder="Nombre de la película o serie..." aria-label="Recomendar producción"/>
+                placeholder="Nombre de la película o serie..." aria-label="Recomendar producción" />
               <button type="submit" class="btn btn-primary" :disabled="!nombrePelicula.trim()">Recomendar</button>
             </div>
           </form>
@@ -105,9 +105,12 @@ function irAComenzar() {
 }
 
 async function enviarRecomendacion() {
+  const user = localStorage.getItem('user');
   try {
     await axios.post('https://movietrackapi.up.railway.app/api/v1/recomendarPelicula', {
       nombre_pelicula: nombrePelicula.value,
+      nombre_usuario: user.name,
+      correo_usuario: user.email
     });
     toast.add({ severity: 'success', summary: 'Recomendación Realizada', detail: '¡Gracias por tu recomendación!', life: 3000, group: 'br' });
     nombrePelicula.value = '';
