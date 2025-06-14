@@ -73,9 +73,16 @@ function estaLogueado() {
 
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !estaLogueado()) {
-    next({ path: '/login' })
+    next({ path: '/login' });
+  } else if (to.meta.requiresEmail) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || user.email !== to.meta.requiresEmail) {
+      next({ path: '/' });
+    } else {
+      next();
+    }
   } else {
-    next()
+    next();
   }
 })
 
