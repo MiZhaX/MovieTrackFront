@@ -9,6 +9,7 @@
             <RouterLink v-else :to="`/login`" class="footer-link">Mi Perfil</RouterLink>
         </nav>
         <p class="footer-copy">© {{ new Date().getFullYear() }} MovieTrack</p>
+        <p class="footer-copy">Las imágenes de los pósters han sido obtenidas de <a href="https://www.themoviedb.org/" target="_blank">TMDb</a>. Todos los derechos pertenecen a sus respectivos propietarios. Este proyecto no tiene fines comerciales.</p>
     </footer>
 </template>
 
