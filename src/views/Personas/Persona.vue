@@ -3,7 +3,14 @@
     <Loading :cargando="cargando"></Loading>
     <div v-if="!cargando && persona" class="contenedor">
         <div class="detalles">
-            <h2 class="nombre">{{ persona.nombre }}</h2>
+            <h2 class="nombre">
+                <template v-if="editando">
+                    <input v-model="formEdicion.nombre" class="form-control text-center" />
+                </template>
+                <template v-else>
+                    {{ persona.nombre }}
+                </template>
+            </h2>
             <div class="infoDetalles">
                 <img :src="posterPath" alt="poster" class="poster" @error="handleImageError">
                 <div class="info d-flex justify-content-between flex-column w-100">
@@ -35,10 +42,33 @@
                         </ul>
                         <div class="tab-content pt-2" id="personaTabContent">
                             <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
-                                <p><strong>Nombre:</strong> {{ persona.nombre }}</p>
-                                <p><strong>Fecha de nacimiento:</strong> {{ formatearFecha(persona.fecha_nacimiento) }}
+                                <p>
+                                    <strong>Nombre:</strong>
+                                    <template v-if="editando">
+                                        <input v-model="formEdicion.nombre" class="form-control" />
+                                    </template>
+                                    <template v-else>
+                                        {{ persona.nombre }}
+                                    </template>
                                 </p>
-                                <p class="biografia"><strong>Biografía:</strong> {{ persona.biografia }}</p>
+                                <p>
+                                    <strong>Fecha de nacimiento:</strong>
+                                    <template v-if="editando">
+                                        <input v-model="formEdicion.fecha_nacimiento" type="date" class="form-control" />
+                                    </template>
+                                    <template v-else>
+                                        {{ formatearFecha(persona.fecha_nacimiento) }}
+                                    </template>
+                                </p>
+                                <p class="biografia">
+                                    <strong>Biografía:</strong>
+                                    <template v-if="editando">
+                                        <textarea v-model="formEdicion.biografia" class="form-control" rows="3"></textarea>
+                                    </template>
+                                    <template v-else>
+                                        {{ persona.biografia }}
+                                    </template>
+                                </p>
                             </div>
                             <div v-if="persona.actuaciones && persona.actuaciones.length > 0" class="tab-pane fade"
                                 id="actuacion" role="tabpanel" aria-labelledby="actuacion-tab">
@@ -60,6 +90,17 @@
                             </div>
                         </div>
                     </div>
+                    <div class="acciones mt-4 d-flex justify-content-start">
+                        <div class="botones d-flex">
+                            <button v-if="esAdmin && !editando" class="btn me-2 btn-primary" @click="activarEdicion">Editar
+                            </button>
+                            <button v-if="esAdmin && editando" class="btn me-2 btn-primary" @click="enviarEdicion">Enviar
+                            </button>
+                            <button v-if="esAdmin && editando" class="btn btn-secondary" @click="cancelarEdicion">Cancelar
+                            </button>
+                            <button v-if="esAdmin" class="btn btn-danger ms-2" @click="eliminarPersona">Eliminar</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -67,7 +108,7 @@
     </div>
 </template>
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
 
@@ -81,6 +122,20 @@ const posterPath = ref('');
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
+
+const user = ref(null);
+const editando = ref(false);
+const formEdicion = reactive({
+    nombre: '',
+    fecha_nacimiento: '',
+    biografia: ''
+});
+const datosOriginales = ref({});
+const esAdmin = computed(() => {
+    const storedUser = localStorage.getItem('user');
+    const u = storedUser ? JSON.parse(storedUser) : null;
+    return u && (u.email === 'mbonelortiz@gmail.com' || u.correo === 'mbonelortiz@gmail.com');
+});
 
 const handleImageError = (event) => {
     event.target.src = '/assets/img/default.png'
@@ -111,7 +166,75 @@ function formatearFecha(fecha) {
     return `${d}/${m}/${a}`;
 }
 
+function activarEdicion() {
+    if (!persona.value) return;
+    editando.value = true;
+    formEdicion.nombre = persona.value.nombre;
+    formEdicion.fecha_nacimiento = persona.value.fecha_nacimiento;
+    formEdicion.biografia = persona.value.biografia;
+    datosOriginales.value = {
+        nombre: formEdicion.nombre,
+        fecha_nacimiento: formEdicion.fecha_nacimiento,
+        biografia: formEdicion.biografia
+    };
+}
+
+function cancelarEdicion() {
+    editando.value = false;
+}
+
+async function enviarEdicion() {
+    const cambios = {};
+    if (formEdicion.nombre !== datosOriginales.value.nombre) cambios.nombre = formEdicion.nombre;
+    if (formEdicion.fecha_nacimiento !== datosOriginales.value.fecha_nacimiento) cambios.fecha_nacimiento = formEdicion.fecha_nacimiento;
+    if (formEdicion.biografia !== datosOriginales.value.biografia) cambios.biografia = formEdicion.biografia;
+
+    if (Object.keys(cambios).length === 0) {
+        editando.value = false;
+        return;
+    }
+
+    try {
+        const token = localStorage.getItem('token');
+        await axios.patch(
+            `https://movietrackapi.up.railway.app/api/v1/personas/${persona.value.id}`,
+            cambios,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+        toast.add({ severity: 'success', summary: 'Persona actualizada', detail: 'Los datos han sido actualizados.', life: 3000, group: 'br' });
+        await fetchPersona();
+        editando.value = false;
+    } catch (error) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo actualizar la persona.', life: 3000, group: 'br' });
+    }
+}
+
+async function eliminarPersona() {
+    if (!persona.value) return;
+    try {
+        const token = localStorage.getItem('token');
+        await axios.delete(
+            `https://movietrackapi.up.railway.app/api/v1/personas/${persona.value.id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+        toast.add({ severity: 'success', summary: 'Persona eliminada', detail: 'La persona ha sido eliminada.', life: 3000, group: 'br' });
+        router.push('/');
+    } catch (error) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo eliminar la persona.', life: 3000, group: 'br' });
+    }
+}
+
 onMounted(async () => {
+    const storedUser = localStorage.getItem('user');
+    user.value = storedUser ? JSON.parse(storedUser) : null;
     fetchPersona();
 })
 </script>
@@ -217,6 +340,12 @@ onMounted(async () => {
     display: flex;
     flex-direction: column;
     justify-content: stretch;
+}
+
+.form-control:focus {
+    outline: none;
+    box-shadow: none;
+    border: 1px solid var(--terciary-color);
 }
 
 @media (max-width: 1270px) {

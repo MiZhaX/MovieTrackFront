@@ -3,11 +3,29 @@
     <Loading :cargando="cargando"></Loading>
     <div v-if="!cargando && produccion" class="contenedor">
         <div class="detalles">
-            <h2 class="titulo">{{ produccion.titulo }}</h2>
+            <h2 class="titulo">
+                <template v-if="editando">
+                    <input v-model="formEdicion.titulo" class="form-control" />
+                </template>
+                <template v-else>
+                    {{ produccion.titulo }}
+                </template>
+            </h2>
             <div class="detalles d-flex flex-column">
                 <div class="resumenDetalles">
-                    <p class="tituloOriginal h6 text-start">{{ produccion.titulo_original }} · {{
-                        formatearDuracion(produccion.duracion) }} · {{ obtenerAño(produccion.fecha_estreno) }}</p>
+                    <p class="tituloOriginal h6 text-start">
+                        <template v-if="editando">
+                            <input v-model="formEdicion.titulo_original" class="form-control"
+                                style="width: 200px; display: inline-block;" />
+                        </template>
+                        <template v-else>
+                            {{ produccion.titulo_original }}
+                        </template>
+                        ·
+                        {{ formatearDuracion(editando ? formEdicion.duracion : produccion.duracion) }}
+                        ·
+                        {{ obtenerAño(produccion.fecha_estreno) }}
+                    </p>
                 </div>
                 <div class="infoDetalles">
                     <img :src="posterPath" alt="poster" class="poster" @error="setDefaultImage" ref="imgRef">
@@ -39,11 +57,58 @@
                             <div class="tab-content pt-2" id="produccionTabContent">
                                 <div class="tab-pane fade show active" id="info" role="tabpanel"
                                     aria-labelledby="info-tab">
-                                    <p><strong>Género:</strong> {{ produccion.genero.nombre }}</p>
-                                    <p><strong>Estreno:</strong> {{ formatearFecha(produccion.fecha_estreno) }}</p>
-                                    <p class="sinopsis"><strong>Sinopsis:</strong> {{ produccion.sinopsis }}</p>
-                                    <p><strong>Duración:</strong> {{ formatearDuracion(produccion.duracion) }}</p>
-                                    <p><strong>Valoración:</strong> {{ produccion.puntuacion_critica }} </p>
+                                    <p>
+                                        <strong>Género:</strong>
+                                        <template v-if="editando">
+                                            <select v-model="formEdicion.genero_id" class="form-control" style="width: 200px; display: inline-block;">
+                                                <option v-for="g in generos" :key="g.id" :value="g.id">{{ g.nombre }}</option>
+                                            </select>
+                                        </template>
+                                        <template v-else>
+                                            {{ produccion.genero.nombre }}
+                                        </template>
+                                    </p>
+                                    <p>
+                                        <strong>Estreno:</strong>
+                                        <template v-if="editando">
+                                            <input v-model="formEdicion.fecha_estreno" type="date" class="form-control"
+                                                style="width: 140px; display: inline-block;" />
+                                        </template>
+                                        <template v-else>
+                                            {{ formatearFecha(produccion.fecha_estreno) }}
+                                        </template>
+                                    </p>
+                                    <p class="sinopsis">
+                                        <strong>Sinopsis:</strong>
+                                        <template v-if="editando">
+                                            <textarea v-model="formEdicion.sinopsis" class="form-control"
+                                                rows="2"></textarea>
+                                        </template>
+                                        <template v-else>
+                                            {{ produccion.sinopsis }}
+                                        </template>
+                                    </p>
+                                    <p>
+                                        <strong>Duración:</strong>
+                                        <template v-if="editando">
+                                            <input v-model="formEdicion.duracion" type="number" min="1"
+                                                class="form-control" style="width: 100px; display: inline-block;" />
+                                        </template>
+                                        <template v-else>
+                                            {{ formatearDuracion(produccion.duracion) }}
+                                        </template>
+                                    </p>
+                                    <p>
+                                        <strong>Valoración:</strong>
+                                        <template v-if="editando">
+                                            <input v-model="formEdicion.puntuacion_critica" type="number" min="0"
+                                                max="10" step="0.1" class="form-control"
+                                                style="width: 80px; display: inline-block;" />
+                                        </template>
+                                        <template v-else>
+                                            {{ produccion.puntuacion_critica }}
+                                        </template>
+                                    </p>
                                 </div>
                                 <div class="tab-pane fade" id="reparto" role="tabpanel" aria-labelledby="reparto-tab">
                                     <div v-if="produccion.actores && produccion.actores.length" class="reparto-lista">
@@ -70,6 +135,14 @@
                             <div class="botones d-flex">
                                 <button class="btn me-2 btn-primary" @click="abrirDialogResena">Reseña</button>
                                 <button class="btn me-2 btn-primary" @click="abrirModalLista">Añadir a lista</button>
+                                <button v-if="esAdmin && !editando" class="btn me-2 btn-primary"
+                                    @click="activarEdicion">Editar</button>
+                                <button v-if="esAdmin && editando" class="btn me-2 btn-primary"
+                                    @click="enviarEdicion">Enviar</button>
+                                <button v-if="esAdmin && editando" class="btn btn-secondary"
+                                    @click="cancelarEdicion">Cancelar</button>
+                                <button v-if="esAdmin" class="btn btn-danger ms-2"
+                                    @click="eliminarProduccion">Eliminar</button>
                             </div>
                             <div class="marcas">
                                 <button :class="['btn', 'me-2', visualizada ? 'btn-secondary' : 'btn-primary']"
@@ -93,19 +166,10 @@
                 </div>
             </div>
             <div v-if="true" class="mt-6">
-                <Carousel
-                    v-if="resenasAleatorias.length > 1"
-                    :value="resenasAleatorias"
-                    :numVisible="1"
-                    :numScroll="1"
-                    circular
-                    :showNavigators="true"
-                    :showIndicators="true"
-                    :touchable="true"
-                    :draggable="true"
-                >
+                <Carousel v-if="resenasAleatorias.length > 1" :value="resenasAleatorias" :numVisible="1" :numScroll="1"
+                    circular :showNavigators="true" :showIndicators="true" :touchable="true" :draggable="true">
                     <template #item="slotProps">
-                    <ResenaCard :resena="slotProps.data" />
+                        <ResenaCard :resena="slotProps.data" />
                     </template>
                 </Carousel>
 
@@ -113,10 +177,11 @@
                     <ResenaCard :resena="resenasAleatorias[0]" />
                 </div>
 
-                <div v-else class="reseña-card p-3 d-flex align-items-center justify-content-center" style="min-height:180px;">
+                <div v-else class="reseña-card p-3 d-flex align-items-center justify-content-center"
+                    style="min-height:180px;">
                     <p class="mb-0 text-center w-100">
-                    Esta producción aún no tiene reseñas.<br />
-                    <span class="fw-bold">¡Sé el primero en dar tu opinión!</span>
+                        Esta producción aún no tiene reseñas.<br />
+                        <span class="fw-bold">¡Sé el primero en dar tu opinión!</span>
                     </p>
                 </div>
             </div>
@@ -141,7 +206,8 @@
             </div>
             <div class="modal-footer mt-3 d-flex gap-2">
                 <button type="submit" class="btn btn-primary"
-                    :disabled="!listaSeleccionada || !listasPersonalizadas.length"><font-awesome-icon :icon="'plus'" /></button>
+                    :disabled="!listaSeleccionada || !listasPersonalizadas.length"><font-awesome-icon
+                        :icon="'plus'" /></button>
             </div>
         </form>
     </Dialog>
@@ -163,14 +229,15 @@
                     maxlength="500"></textarea>
             </div>
             <div class="modal-footer mt-3 d-flex gap-2 justify-content-end">
-                <button type="submit" class="btn btn-primary" :disabled="puntuacion === 0"><font-awesome-icon :icon="'plus'" /></button>
+                <button type="submit" class="btn btn-primary" :disabled="puntuacion === 0"><font-awesome-icon
+                        :icon="'plus'" /></button>
             </div>
         </form>
     </Dialog>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed, reactive } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import Loading from '@/components/UI/Loading.vue';
@@ -204,6 +271,7 @@ const puntuacionOriginal = ref(null)
 const descripcionOriginal = ref('')
 const resenasAleatorias = ref([]);
 const router = useRouter();
+const generos = ref([]);
 
 
 function abrirModalLista() {
@@ -418,9 +486,19 @@ async function fetchListasPersonalizadas() {
     }
 }
 
+async function fetchGeneros() {
+    try {
+        const { data } = await axios.get('https://movietrackapi.up.railway.app/api/v1/generos');
+        generos.value = data.data || [];
+    } catch (error) {
+        generos.value = [];
+    }
+}
+
 onMounted(async () => {
     const storedUser = localStorage.getItem('user');
     user.value = storedUser ? JSON.parse(storedUser) : null;
+    await fetchGeneros();
     await fetchProduccion();
     await comprobarMarca();
     await fetchListasPersonalizadas();
@@ -570,6 +648,97 @@ function puntuarProduccion() {
     }
 }
 
+const editando = ref(false);
+const formEdicion = reactive({
+    titulo: '',
+    titulo_original: '',
+    genero_id: '',
+    fecha_estreno: '',
+    sinopsis: '',
+    duracion: '',
+    puntuacion_critica: ''
+});
+const datosOriginales = ref({});
+const esAdmin = computed(() => user.value && user.value.email === 'mbonelortiz@gmail.com');
+
+function activarEdicion() {
+    if (!produccion.value) return;
+    editando.value = true;
+    formEdicion.titulo = produccion.value.titulo;
+    formEdicion.titulo_original = produccion.value.titulo_original;
+    formEdicion.genero_id = produccion.value.genero.id;
+    formEdicion.fecha_estreno = produccion.value.fecha_estreno;
+    formEdicion.sinopsis = produccion.value.sinopsis;
+    formEdicion.duracion = produccion.value.duracion;
+    formEdicion.puntuacion_critica = produccion.value.puntuacion_critica;
+    datosOriginales.value = {
+        titulo: formEdicion.titulo,
+        titulo_original: formEdicion.titulo_original,
+        genero_id: formEdicion.genero_id,
+        fecha_estreno: formEdicion.fecha_estreno,
+        sinopsis: formEdicion.sinopsis,
+        duracion: formEdicion.duracion,
+        puntuacion_critica: formEdicion.puntuacion_critica
+    };
+}
+
+function cancelarEdicion() {
+    editando.value = false;
+}
+
+async function enviarEdicion() {
+    // Comprobar si hay cambios
+    const cambios = {};
+    if (formEdicion.titulo !== datosOriginales.value.titulo) cambios.titulo = formEdicion.titulo;
+    if (formEdicion.titulo_original !== datosOriginales.value.titulo_original) cambios.titulo_original = formEdicion.titulo_original;
+    if (formEdicion.genero_id !== datosOriginales.value.genero_id) cambios.genero_id = formEdicion.genero_id;
+    if (formEdicion.fecha_estreno !== datosOriginales.value.fecha_estreno) cambios.fecha_estreno = formEdicion.fecha_estreno;
+    if (formEdicion.sinopsis !== datosOriginales.value.sinopsis) cambios.sinopsis = formEdicion.sinopsis;
+    if (formEdicion.duracion !== datosOriginales.value.duracion) cambios.duracion = formEdicion.duracion;
+    if (formEdicion.puntuacion_critica !== datosOriginales.value.puntuacion_critica) cambios.puntuacion_critica = formEdicion.puntuacion_critica;
+
+    if (Object.keys(cambios).length === 0) {
+        editando.value = false;
+        return;
+    }
+
+    try {
+        const token = localStorage.getItem('token');
+        await axios.patch(
+            `https://movietrackapi.up.railway.app/api/v1/producciones/${produccion.value.id}`,
+            cambios,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+        toast.add({ severity: 'success', summary: 'Producción actualizada', detail: 'Los datos han sido actualizados.', life: 3000, group: 'br' });
+        await fetchProduccion();
+        editando.value = false;
+    } catch (error) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo actualizar la producción.', life: 3000, group: 'br' });
+    }
+}
+
+async function eliminarProduccion() {
+    if (!produccion.value) return;
+    try {
+        const token = localStorage.getItem('token');
+        await axios.delete(
+            `https://movietrackapi.up.railway.app/api/v1/producciones/${produccion.value.id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+        toast.add({ severity: 'success', summary: 'Producción eliminada', detail: 'La producción ha sido eliminada.', life: 3000, group: 'br' });
+        router.push('/');
+    } catch (error) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo eliminar la producción.', life: 3000, group: 'br' });
+    }
+}
 </script>
 
 <style scoped>
@@ -724,21 +893,27 @@ function puntuarProduccion() {
 }
 
 .reseña-card {
-  background: var(--cuaternary-color);
-  border-radius: 10px;
-  height: 100%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
-  margin: 0 auto;
+    background: var(--cuaternary-color);
+    border-radius: 10px;
+    height: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: 0 auto;
 }
+
 
 textarea.form-control {
     resize: vertical;
 }
 
-textarea.form-control:focus {
+.form-control:focus {
     outline: none;
     box-shadow: none;
+    border: 1px solid var(--terciary-color);
+}
+
+input.form-control {
+    text-align: center;
 }
 
 @media (max-width: 1270px) {
