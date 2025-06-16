@@ -99,8 +99,8 @@ async function enviarRecomendacion() {
     try {
         await axios.post('https://movietrackapi.up.railway.app/api/v1/recomendarPelicula', {
             nombre_pelicula: nombrePelicula.value,
-            nombre_usuario: user.name,
-            correo_usuario: user.email
+            nombre_usuario: user.name || "Usuario invitado",
+            correo_usuario: user.email || ""
         });
         toast.add({ severity: 'success', summary: 'Recomendación Realizada', detail: '¡Gracias por tu recomendación!', life: 3000, group: 'br' });
         nombrePelicula.value = '';
