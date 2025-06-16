@@ -37,12 +37,24 @@
                 </div>
             </div>
             <div v-else>
-                <h2 class="nombre-lista">{{ nombreLista }} <button
-                        v-if="lista.usuario_id && usuarioId.id && lista.usuario_id == usuarioId.id" class="btnEditar"
-                        @click="abrirModalBorrarLista">
+                <h2 class="nombre-lista mb-2">
+                    <input v-if="modoEdicion" v-model="nombreListaEdit" :disabled="!modoEdicion"
+                        class="input-editar-nombre mr-3" maxlength="50" />
+                    <span v-else class="mr-3">{{ nombreLista }}</span>
+                    <button v-if="lista.usuario_id && usuarioId.id && lista.usuario_id == usuarioId.id"
+                        class="btnEditar" @click="toggleEdicion">
+                        <font-awesome-icon :icon="!modoEdicion ? 'pen' : 'pen-ruler'" />
+                    </button>
+                    <button v-if="lista.usuario_id && usuarioId.id && lista.usuario_id == usuarioId.id"
+                        class="btnEditar" @click="abrirModalBorrarLista">
                         <font-awesome-icon :icon="['fas', 'trash-can']" />
-                    </button></h2>
-                <p class="text-center">No hay producciones en esta lista.</p>
+                    </button>
+                </h2>
+                <p class="text-center descripcion">
+                    <textarea v-if="modoEdicion" v-model="descripcionEdit" :disabled="!modoEdicion" placeholder="Agrega una descripción..."
+                        class="input-editar-desc" maxlength="255" rows="2" />
+                    <span v-else>{{ descripcion }}</span>
+                </p>
             </div>
         </div>
     </div>
