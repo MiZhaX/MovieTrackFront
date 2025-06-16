@@ -55,6 +55,7 @@
                         class="input-editar-desc" maxlength="255" rows="2" />
                     <span v-else>{{ descripcion }}</span>
                 </p>
+                <p class="text-center"><strong>No hay producciones en esta lista.</strong></p>
             </div>
         </div>
     </div>
